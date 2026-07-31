@@ -6,6 +6,7 @@ import androidx.paging.PagingState
 import com.example.tmdbmovies.core.common.AppError
 import com.example.tmdbmovies.core.common.AppErrorException
 import com.example.tmdbmovies.data.remote.dto.MovieDto
+import com.example.tmdbmovies.data.remote.dto.MovieDetailsDto
 import com.example.tmdbmovies.data.remote.dto.PagedResponseDto
 import com.example.tmdbmovies.domain.model.Movie
 import com.example.tmdbmovies.domain.model.MovieFilters
@@ -175,6 +176,9 @@ class DiscoverMoviesPagingSourceTest {
                 )
             return responseForPage(page)
         }
+
+        override suspend fun movieDetails(movieId: Long, language: String): MovieDetailsDto =
+            error("Details are not used by paging tests")
     }
 
     private companion object {

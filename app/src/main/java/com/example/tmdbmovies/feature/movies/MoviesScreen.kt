@@ -185,6 +185,7 @@ private fun errorMessage(error: Throwable): String = when ((error as? AppErrorEx
     AppError.Timeout -> stringResource(R.string.error_timeout)
     AppError.Unauthorized -> stringResource(R.string.error_unauthorized)
     AppError.RateLimited -> stringResource(R.string.error_rate_limited)
+    AppError.NotFound,
     is AppError.UnexpectedHttp,
     AppError.InvalidData,
     AppError.Unknown,

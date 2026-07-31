@@ -3,6 +3,7 @@ package com.example.tmdbmovies.data.repository
 import androidx.paging.testing.asSnapshot
 import com.example.tmdbmovies.data.remote.TmdbApi
 import com.example.tmdbmovies.data.remote.dto.MovieDto
+import com.example.tmdbmovies.data.remote.dto.MovieDetailsDto
 import com.example.tmdbmovies.data.remote.dto.PagedResponseDto
 import com.example.tmdbmovies.domain.model.MovieFilters
 import kotlinx.coroutines.test.runTest
@@ -48,5 +49,8 @@ class TmdbMovieRepositoryTest {
                 2 -> PagedResponseDto(page, listOf(MovieDto(id = 3, title = "Three"), MovieDto(id = 4, title = "Four")), 2, 4)
                 else -> error("Unexpected page $page")
             }
+
+        override suspend fun movieDetails(movieId: Long, language: String): MovieDetailsDto =
+            error("Details are not used by paging tests")
     }
 }

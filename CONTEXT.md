@@ -6,9 +6,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 4 — Detalhes em XML é a próxima fase a implementar; a Fase 3 foi concluída após validação manual da lista paginada no AVD.
+**Fase atual:** Fase 5 — Pesquisa e filtros é a próxima fase a implementar; a Fase 4 foi concluída com testes unitários e instrumentados no AVD.
 
-**Código Android:** módulo único `app` com descoberta paginada real em Compose, Retrofit/Paging/Coil e navegação por ID; detalhes e favoritos ainda são placeholders.
+**Código Android:** módulo único `app` com descoberta paginada real em Compose, detalhes reais em Fragment XML, Retrofit/Paging/Coil e navegação por ID; pesquisa, filtros e favoritos ainda não foram implementados.
 
 ## Decisões confirmadas
 
@@ -33,6 +33,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Falhas paginadas chegam à UI como `AppErrorException`, preservando a categoria `AppError` e a causa técnica sem exibir mensagem bruta.
 - `MoviesViewModel` transforma domínio em `MovieUiModel`, usa `cachedIn(viewModelScope)` e deixa loading/erro/retry sob responsabilidade dos `LoadState` do Paging.
 - A tela da lista trata refresh/append loading e erro, vazio, conteúdo, retry, fallback de imagem/data, insets seguros e navegação apenas com `movieId`.
+- `MovieRepository.movieDetails(movieId)` consulta `GET movie/{movie_id}` em `pt-BR`, converte DTO em `MovieDetails` e entrega falhas tipadas por `AppResult`.
+- `MovieDetailsViewModel` recebe o ID por `SavedStateHandle`, expõe um único `LiveData<MovieDetailsUiState>` e preserva conteúdo durante recriação da Activity.
+- `MovieDetailsFragment` usa view binding, observa com `viewLifecycleOwner` e renderiza loading, erro recuperável, conteúdo, fallbacks de título/sinopse/data/imagem e retry.
 - O manifesto declara `android.permission.INTERNET`; sua ausência causava o encerramento do processo quando o OkHttp iniciava a primeira chamada à TMDB.
 - AndroidX Test foi ajustado para `ext.junit 1.3.0` e Espresso `3.7.0`; o Espresso 3.6.1 era incompatível com Android 17 por usar `InputManager.getInstance` via reflexão.
 - OkHttp permanece em `4.12.0`, a versão resolvida pelo Retrofit `3.0.0`; não há logging HTTP nesta fase.
@@ -41,7 +44,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Próxima ação
 
-Implementar a **Fase 4 — Detalhes em XML**: endpoint e mapeamento de detalhes, repository, `MovieDetailsViewModel` com LiveData, Fragment com view binding e estados de loading, erro, conteúdo e retry.
+Implementar a **Fase 5 — Pesquisa e filtros**: endpoints de search e gêneros, política de filtros por endpoint, debounce/cancelamento, novo Pager por consulta/filtro e UI com preservação de estado.
 
 ## Escolhas provisórias do bootstrap
 
@@ -87,6 +90,12 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: não duplicar `LoadState` no ViewModel; manter busca/filtros completos para a Fase 5; atualizar AndroidX Test para ext.junit 1.3.0 e Espresso 3.7.0 por compatibilidade com Android 17; declarar `android.permission.INTERNET` no manifesto.
 - Pendente: iniciar a Fase 4 — Detalhes em XML.
 - Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou com 17 testes unitários e lint sem erros; `./gradlew connectedDebugAndroidTest` passou com 3 testes Compose no Pixel_9/API 37; Logcat identificou a ausência da permissão de internet, a correção compilou com sucesso e a lista de filmes foi confirmada manualmente no AVD.
+
+2026-07-31 — Fase 4 concluída
+- Concluído: endpoint e DTO de detalhes, mapeamento para domínio, repository com falhas tipadas, ViewModel com LiveData/SavedStateHandle e Fragment XML com view binding, loading, erro, conteúdo, retry e fallbacks.
+- Decidido: mapear HTTP 404 como `AppError.NotFound`; manter favoritos fora desta fase; usar Coil Views para o pôster XML e `core-testing` apenas em testes de LiveData.
+- Pendente: iniciar a Fase 5 — Pesquisa e filtros; validar manualmente detalhes reais, modo avião, paisagem, fonte ampliada e filme sem metadados durante o polimento/checklist final.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 23 testes unitários, lint sem erros e 4 testes instrumentados no Pixel_9/API 37, incluindo erro/retry/conteúdo/recriação do Fragment XML.
 ```
 
 Use este formato para entradas futuras:

@@ -20,6 +20,7 @@ class NetworkErrorMapperTest {
     @Test
     fun `http failures map status categories`() {
         assertEquals(AppError.Unauthorized, httpException(401).toAppError())
+        assertEquals(AppError.NotFound, httpException(404).toAppError())
         assertEquals(AppError.RateLimited, httpException(429).toAppError())
         assertEquals(AppError.UnexpectedHttp(503), httpException(503).toAppError())
     }

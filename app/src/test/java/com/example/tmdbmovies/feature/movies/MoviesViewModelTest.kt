@@ -4,6 +4,8 @@ import androidx.paging.PagingData
 import androidx.lifecycle.viewModelScope
 import com.example.tmdbmovies.domain.model.Movie
 import com.example.tmdbmovies.domain.model.MovieFilters
+import com.example.tmdbmovies.domain.model.MovieDetails
+import com.example.tmdbmovies.core.common.AppResult
 import com.example.tmdbmovies.domain.repository.MovieRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,5 +61,8 @@ class MoviesViewModelTest {
             this.filters = filters
             return flowOf(PagingData.from(movies))
         }
+
+        override suspend fun movieDetails(movieId: Long): AppResult<MovieDetails> =
+            error("Details are not used by movies tests")
     }
 }

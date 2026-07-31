@@ -12,6 +12,7 @@ internal fun Throwable.toAppError(): AppError =
         is HttpException ->
             when (code()) {
                 401 -> AppError.Unauthorized
+                404 -> AppError.NotFound
                 429 -> AppError.RateLimited
                 else -> AppError.UnexpectedHttp(code())
             }

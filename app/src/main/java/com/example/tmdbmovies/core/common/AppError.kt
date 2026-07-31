@@ -9,6 +9,8 @@ sealed interface AppError {
 
     data object RateLimited : AppError
 
+    data object NotFound : AppError
+
     data class UnexpectedHttp(val statusCode: Int) : AppError
 
     data object InvalidData : AppError

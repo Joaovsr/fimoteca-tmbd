@@ -13,7 +13,10 @@
     <string name="error_rate_limited">Too many requests. Please try again shortly.</string>
     <string name="error_generic">We could not load movies. Try again.</string>
     <string name="details_title">Movie details</string>
-    <string name="details_placeholder">Movie details will appear here.</string>
+    <string name="details_loading">Loading movie details</string>
+    <string name="movie_overview_unavailable">Synopsis unavailable.</string>
+    <string name="details_error_not_found">This movie is no longer available.</string>
+    <string name="details_error_generic">We could not load movie details. Try again.</string>
     <string name="favorites_title">Favorites</string>
     <string name="favorites_placeholder">Favorite movies will appear here.</string>
 </resources>
