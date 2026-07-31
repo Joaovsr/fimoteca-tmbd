@@ -5,12 +5,13 @@ import androidx.annotation.StringRes
 sealed interface MovieDetailsUiState {
     data object Loading : MovieDetailsUiState
 
-    data class Content(val movie: MovieDetailsUiModel) : MovieDetailsUiState
+    data class Content(val movie: MovieDetailsUiModel, val isFavorite: Boolean) : MovieDetailsUiState
 
     data class Error(@param:StringRes val messageRes: Int) : MovieDetailsUiState
 }
 
 data class MovieDetailsUiModel(
+    val id: Long,
     val title: String?,
     val overview: String?,
     val releaseDate: String?,

@@ -75,6 +75,9 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
 
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.paging.common)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
@@ -82,16 +85,14 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlinx.serialization)
 
-    testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.okhttp.mockwebserver)
-    kspTest(libs.androidx.room.compiler)
-
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

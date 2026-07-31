@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_moviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
+        <action
+            android:id="@+id/action_moviesFragment_to_favoritesFragment"
+            app:destination="@id/favoritesFragment" />
     </fragment>
 
     <fragment
@@ -25,5 +28,9 @@
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.example.tmdbmovies.feature.favorites.FavoritesFragment"
-        android:label="@string/favorites_title" />
+        android:label="@string/favorites_title">
+        <action
+            android:id="@+id/action_favoritesFragment_to_movieDetailsFragment"
+            app:destination="@id/movieDetailsFragment" />
+    </fragment>
 </navigation>

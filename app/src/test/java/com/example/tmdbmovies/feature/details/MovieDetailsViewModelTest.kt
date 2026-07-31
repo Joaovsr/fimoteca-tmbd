@@ -11,6 +11,7 @@ import com.example.tmdbmovies.domain.model.MovieDetails
 import com.example.tmdbmovies.domain.model.MovieFilters
 import com.example.tmdbmovies.domain.model.Genre
 import com.example.tmdbmovies.domain.repository.MovieRepository
+import com.example.tmdbmovies.test.FakeFavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +52,7 @@ class MovieDetailsViewModelTest {
                 AppResult.Success(MovieDetails(42, "  Movie  ", "  ", null, null, "")),
             ),
         )
-        val viewModel = MovieDetailsViewModel(repository, SavedStateHandle(mapOf("movieId" to 42L)))
+        val viewModel = MovieDetailsViewModel(repository, FakeFavoriteRepository(), SavedStateHandle(mapOf("movieId" to 42L)))
 
         assertEquals(MovieDetailsUiState.Loading, viewModel.state.value)
         advanceUntilIdle()
@@ -71,7 +72,7 @@ class MovieDetailsViewModelTest {
                 AppResult.Success(MovieDetails(42, "Recovered", null, null, null, null)),
             ),
         )
-        val viewModel = MovieDetailsViewModel(repository, SavedStateHandle(mapOf("movieId" to 42L)))
+        val viewModel = MovieDetailsViewModel(repository, FakeFavoriteRepository(), SavedStateHandle(mapOf("movieId" to 42L)))
 
         advanceUntilIdle()
         assertEquals(MovieDetailsUiState.Error(R.string.error_no_connection), viewModel.state.value)
@@ -81,6 +82,24 @@ class MovieDetailsViewModelTest {
         advanceUntilIdle()
         assertTrue(viewModel.state.value is MovieDetailsUiState.Content)
         assertEquals(2, repository.requests.size)
+    }
+
+    @Test
+    fun `favorite action persists details and room emission updates content`() = runTest(dispatcher) {
+        val repository = FakeRepository(
+            mutableListOf(AppResult.Success(MovieDetails(42, "Movie", "Overview", "/poster", "/backdrop", "2026-07-31"))),
+        )
+        val favorites = FakeFavoriteRepository()
+        val viewModel = MovieDetailsViewModel(repository, favorites, SavedStateHandle(mapOf("movieId" to 42L)))
+        advanceUntilIdle()
+
+        viewModel.onFavoriteClick()
+        advanceUntilIdle()
+
+        val change = favorites.changes.single()
+        assertEquals(42L, change.first.movieId)
+        assertTrue(change.second)
+        assertTrue((viewModel.state.value as MovieDetailsUiState.Content).isFavorite)
     }
 
     private class FakeRepository(

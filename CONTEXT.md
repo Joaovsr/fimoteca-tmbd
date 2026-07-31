@@ -6,9 +6,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 6 — Favoritos com Room é a próxima fase a implementar; a Fase 5 foi concluída com testes unitários, instrumentados e validação manual no AVD.
+**Fase atual:** Fase 7 — Polimento é a próxima fase a implementar; a Fase 6 foi concluída com testes unitários e instrumentados no AVD.
 
-**Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, Retrofit/Paging/Coil e navegação por ID; favoritos ainda não foram implementados.
+**Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, favoritos persistentes com Room, Retrofit/Paging/Coil e navegação por ID.
 
 ## Decisões confirmadas
 
@@ -36,6 +36,11 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - `MoviesViewModel` preserva consulta e filtros no `SavedStateHandle`, aplica debounce de 400 ms, cancela fluxos obsoletos com `flatMapLatest` e cria uma nova geração de Paging por requisição efetiva.
 - Gêneros vêm de `genre/movie/list` como `AppResult`, com loading, erro independente e retry; a UI mantém filtros exclusivos de descoberta ocultos/inativos durante pesquisa sem apagá-los.
 - A tela Compose oferece busca/limpar, filtros de gênero, ordenação, nota mínima e ano, chips removíveis, limpar todos e retorno ao topo quando a requisição efetiva muda.
+- Room é a fonte de verdade para favoritos; `FavoriteRepository` expõe lista e estado por `Flow` e operações idempotentes por `AppResult`.
+- Upserts preservam o `favoritedAt` original em transação, mantendo a ordenação estável mesmo quando salvar é repetido.
+- Lista e detalhes combinam o estado local sem nova chamada remota; detalhes converte `MovieDetails` explicitamente em `Movie` antes de persistir.
+- A tela Compose de favoritos trata loading, erro, vazio, conteúdo, remoção e navegação para detalhes por `movieId`.
+- O fluxo remoto de `PagingData` é cacheado antes de ser combinado com o `Flow` do Room; cachear somente depois do `combine` reutilizava um `pageEventFlow` não cacheado e encerrava o app ao alterar favorito na lista.
 - `MovieRepository.movieDetails(movieId)` consulta `GET movie/{movie_id}` em `pt-BR`, converte DTO em `MovieDetails` e entrega falhas tipadas por `AppResult`.
 - `MovieDetailsViewModel` recebe o ID por `SavedStateHandle`, expõe um único `LiveData<MovieDetailsUiState>` e preserva conteúdo durante recriação da Activity.
 - `MovieDetailsFragment` usa view binding, observa com `viewLifecycleOwner` e renderiza loading, erro recuperável, conteúdo, fallbacks de título/sinopse/data/imagem e retry.
@@ -47,7 +52,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Próxima ação
 
-Implementar a **Fase 6 — Favoritos com Room**: banco/DAO/mapeadores, repositório local, favoritar/desfavoritar em lista e detalhes e tela Compose de favoritos com persistência e testes instrumentados.
+Implementar a **Fase 7 — Polimento**: revisar tema claro/escuro, acessibilidade e fonte ampliada, fallbacks e mensagens, créditos do TMDB, README final, screenshots e checklist manual completo.
 
 ## Escolhas provisórias do bootstrap
 
@@ -104,6 +109,18 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: centralizar compatibilidade em `MovieFilters.compatibleWithQuery`; manter gênero/ordenação/nota como preferências latentes durante pesquisa e aplicar somente ano no `search/movie`; usar debounce de 400 ms.
 - Pendente: iniciar a Fase 6 — Favoritos com Room; validar manualmente rotação, digitação rápida, combinações de filtros e fonte ampliada durante o polimento/checklist final.
 - Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 36 testes unitários, lint sem erros e 8 testes instrumentados no Pixel_9/API 37; descoberta e pesquisa real por “Alien” foram validadas manualmente no AVD.
+
+2026-07-31 — Fase 6 concluída
+- Concluído: banco/DAO/mapeadores Room, repository local, favorito reativo na lista e detalhes, tela Compose de favoritos, estado vazio, remoção e navegação por ID.
+- Decidido: preservar `favoritedAt` em upsert repetido para idempotência e ordenação estável; manter Room como única fonte de verdade e combinar seu Flow ao Paging sem nova requisição remota.
+- Pendente: executar na Fase 7 a validação visual/manual de encerramento real do processo, tema, paisagem, fonte ampliada e acessibilidade.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou com 42 testes unitários e lint sem erros; `./gradlew connectedDebugAndroidTest` passou com 12 testes no Pixel_9/API 37, incluindo DAO em memória, fechamento/reabertura de banco em disco e UI Compose de favoritos.
+
+2026-07-31 — Regressão de favorito na lista corrigida
+- Concluído: corrigido crash ao remover favorito diretamente do card paginado e adicionado teste instrumentado com `Pager`/`PagingSource` reais.
+- Decidido: aplicar `cachedIn(viewModelScope)` ao fluxo paginado antes do `combine` com favoritos, preservando uma geração coletável novamente a cada emissão do Room.
+- Pendente: nenhum risco adicional desta correção; permanece o checklist manual da Fase 7.
+- Evidência: o teste reproduziu `Attempt to collect twice from pageEventFlow` antes da correção e passou depois; gates padrão passaram com 42 testes unitários, lint sem erros e 13 instrumentados no Pixel_9/API 37; Logcat final sem `AndroidRuntime`.
 ```
 
 Use este formato para entradas futuras:

@@ -14,6 +14,7 @@ import com.example.tmdbmovies.domain.model.MovieFilters
 import com.example.tmdbmovies.domain.model.MovieSortOrder
 import com.example.tmdbmovies.domain.model.compatibleWithQuery
 import com.example.tmdbmovies.domain.repository.MovieRepository
+import com.example.tmdbmovies.domain.repository.FavoriteRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class MoviesViewModel(
     private val repository: MovieRepository,
+    private val favoriteRepository: FavoriteRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val query = MutableStateFlow(savedStateHandle[QUERY_KEY] ?: "")
@@ -63,9 +65,16 @@ class MoviesViewModel(
         }
         .distinctUntilChanged()
 
-    val movies: Flow<PagingData<MovieUiModel>> = requests
+    private val pagedMovies = requests
         .flatMapLatest { request -> repository.pagedMovies(request.query, request.filters) }
-        .map { pagingData -> pagingData.map { it.toUiModel() } }
+        .cachedIn(viewModelScope)
+
+    val movies: Flow<PagingData<MovieUiModel>> = combine(
+        pagedMovies,
+        favoriteRepository.observeFavorites().map { movies -> movies.mapTo(mutableSetOf()) { it.movieId } },
+    ) { pagingData, favoriteIds ->
+        pagingData.map { movie -> movie.toUiModel(movie.movieId in favoriteIds) }
+    }
         .cachedIn(viewModelScope)
 
     init {
@@ -93,6 +102,12 @@ class MoviesViewModel(
     fun clearFilters() = updateFilters(MovieFilters())
 
     fun retryGenres() = loadGenres()
+
+    fun onFavoriteClick(movie: MovieUiModel) {
+        viewModelScope.launch {
+            favoriteRepository.setFavorite(movie.toDomain(), !movie.isFavorite)
+        }
+    }
 
     private fun updateFilters(value: MovieFilters) {
         filters.value = value

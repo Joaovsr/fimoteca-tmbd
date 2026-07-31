@@ -11,14 +11,17 @@ import com.example.tmdbmovies.domain.model.MovieDetails
 import com.example.tmdbmovies.domain.model.MovieFilters
 import com.example.tmdbmovies.domain.model.MovieSortOrder
 import com.example.tmdbmovies.domain.repository.MovieRepository
+import com.example.tmdbmovies.test.FakeFavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -53,7 +56,7 @@ class MoviesViewModelTest {
             movies = listOf(Movie(7, "  Movie title  ", null, "/poster.jpg", null, " 2026-07-31 ", null, emptyList())),
             genreResults = mutableListOf(AppResult.Success(listOf(Genre(18, "Drama"), Genre(28, "Action")))),
         )
-        val viewModel = MoviesViewModel(repository, SavedStateHandle())
+        val viewModel = MoviesViewModel(repository, FakeFavoriteRepository(), SavedStateHandle())
 
         backgroundScope.launch { viewModel.movies.collect {} }
         advanceUntilIdle()
@@ -70,7 +73,7 @@ class MoviesViewModelTest {
     @Test
     fun `search is debounced and only the latest query starts a pager`() = runTest(dispatcher) {
         val repository = FakeMovieRepository()
-        val viewModel = MoviesViewModel(repository, SavedStateHandle())
+        val viewModel = MoviesViewModel(repository, FakeFavoriteRepository(), SavedStateHandle())
         backgroundScope.launch { viewModel.movies.collect {} }
         runCurrent()
 
@@ -92,7 +95,7 @@ class MoviesViewModelTest {
     @Test
     fun `new effective request cancels obsolete repository flow`() = runTest(dispatcher) {
         val repository = CancellableRepository()
-        val viewModel = MoviesViewModel(repository, SavedStateHandle())
+        val viewModel = MoviesViewModel(repository, FakeFavoriteRepository(), SavedStateHandle())
         backgroundScope.launch { viewModel.movies.collect {} }
         runCurrent()
 
@@ -110,7 +113,7 @@ class MoviesViewModelTest {
     @Test
     fun `search hides incompatible filters and only effective changes restart paging`() = runTest(dispatcher) {
         val repository = FakeMovieRepository()
-        val viewModel = MoviesViewModel(repository, SavedStateHandle())
+        val viewModel = MoviesViewModel(repository, FakeFavoriteRepository(), SavedStateHandle())
         backgroundScope.launch { viewModel.movies.collect {} }
         runCurrent()
 
@@ -139,12 +142,12 @@ class MoviesViewModelTest {
     @Test
     fun `query and filters are restored from SavedStateHandle`() = runTest(dispatcher) {
         val handle = SavedStateHandle()
-        val first = MoviesViewModel(FakeMovieRepository(), handle)
+        val first = MoviesViewModel(FakeMovieRepository(), FakeFavoriteRepository(), handle)
         first.onQueryChanged("Matrix")
         first.onFiltersChanged(MovieFilters(878, MovieSortOrder.ReleaseDateDescending, 5.0, 1999))
         advanceUntilIdle()
 
-        val restored = MoviesViewModel(FakeMovieRepository(), handle)
+        val restored = MoviesViewModel(FakeMovieRepository(), FakeFavoriteRepository(), handle)
         advanceUntilIdle()
 
         assertEquals("Matrix", restored.state.value.query)
@@ -159,7 +162,7 @@ class MoviesViewModelTest {
                 AppResult.Success(listOf(Genre(18, "Drama"))),
             ),
         )
-        val viewModel = MoviesViewModel(repository, SavedStateHandle())
+        val viewModel = MoviesViewModel(repository, FakeFavoriteRepository(), SavedStateHandle())
         advanceUntilIdle()
 
         assertEquals(R.string.error_no_connection, viewModel.state.value.genresErrorMessageRes)
@@ -170,6 +173,49 @@ class MoviesViewModelTest {
 
         assertNull(viewModel.state.value.genresErrorMessageRes)
         assertEquals("Drama", viewModel.state.value.genres.single().name)
+    }
+
+    @Test
+    fun `favorite action writes the complete movie and requested state`() = runTest(dispatcher) {
+        val favorites = FakeFavoriteRepository()
+        val viewModel = MoviesViewModel(FakeMovieRepository(), favorites, SavedStateHandle())
+        val uiMovie = MovieUiModel(
+            id = 9,
+            title = "Movie",
+            releaseDate = "2026-07-31",
+            posterPath = "/poster",
+            overview = "Overview",
+            genreIds = listOf(18),
+        )
+
+        viewModel.onFavoriteClick(uiMovie)
+        advanceUntilIdle()
+
+        val change = favorites.changes.single()
+        assertEquals(9L, change.first.movieId)
+        assertEquals("Overview", change.first.overview)
+        assertEquals(listOf(18L), change.first.genreIds)
+        assertTrue(change.second)
+    }
+
+    @Test
+    fun `favorite flow remaps loaded page without another remote request`() = runTest(dispatcher) {
+        val movie = Movie(9, "Movie", null, null, null, null, null, emptyList())
+        val repository = FakeMovieRepository(movies = listOf(movie))
+        val favorites = FakeFavoriteRepository()
+        val viewModel = MoviesViewModel(repository, favorites, SavedStateHandle())
+        val emissions = mutableListOf<PagingData<MovieUiModel>>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.movies.take(2).collect(emissions::add)
+        }
+        runCurrent()
+
+        viewModel.onFavoriteClick(movie.toUiModel())
+        runCurrent()
+
+        assertEquals(2, emissions.size)
+        assertTrue(movie.toUiModel(isFavorite = true).isFavorite)
+        assertEquals(1, repository.requests.size)
     }
 
     private data class Request(val query: String, val filters: MovieFilters)

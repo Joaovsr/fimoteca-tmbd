@@ -42,5 +42,11 @@
     <string name="details_error_not_found">This movie is no longer available.</string>
     <string name="details_error_generic">We could not load movie details. Try again.</string>
     <string name="favorites_title">Favorites</string>
-    <string name="favorites_placeholder">Favorite movies will appear here.</string>
+    <string name="favorites_empty">Your favorite movies will appear here.</string>
+    <string name="favorites_error">We could not load your favorites.</string>
+    <string name="favorite_save">Save favorite</string>
+    <string name="favorite_remove">Remove favorite</string>
+    <string name="favorite_save_description">Save %1$s as a favorite</string>
+    <string name="favorite_remove_description">Remove %1$s from favorites</string>
+    <string name="back">Back</string>
 </resources>

@@ -31,6 +31,7 @@ class MovieDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val binding = requireNotNull(binding)
         binding.retryButton.setOnClickListener { viewModel.retry() }
+        binding.favoriteButton.setOnClickListener { viewModel.onFavoriteClick() }
         viewModel.state.observe(viewLifecycleOwner, ::render)
     }
 
@@ -48,15 +49,24 @@ class MovieDetailsFragment : Fragment() {
         when (state) {
             MovieDetailsUiState.Loading -> Unit
             is MovieDetailsUiState.Error -> binding.errorMessage.setText(state.messageRes)
-            is MovieDetailsUiState.Content -> renderContent(binding, state.movie)
+            is MovieDetailsUiState.Content -> renderContent(binding, state.movie, state.isFavorite)
         }
     }
 
-    private fun renderContent(binding: FragmentMovieDetailsBinding, movie: MovieDetailsUiModel) {
+    private fun renderContent(
+        binding: FragmentMovieDetailsBinding,
+        movie: MovieDetailsUiModel,
+        isFavorite: Boolean,
+    ) {
         val title = movie.title ?: getString(R.string.movie_title_unavailable)
         binding.movieTitle.text = title
         binding.movieOverview.text = movie.overview ?: getString(R.string.movie_overview_unavailable)
         binding.movieReleaseDate.text = movie.releaseDate ?: getString(R.string.movie_date_unavailable)
+        binding.favoriteButton.setText(if (isFavorite) R.string.favorite_remove else R.string.favorite_save)
+        binding.favoriteButton.contentDescription = getString(
+            if (isFavorite) R.string.favorite_remove_description else R.string.favorite_save_description,
+            title,
+        )
         binding.moviePoster.contentDescription = getString(R.string.movie_poster_content_description, title)
         binding.moviePoster.load(tmdbPosterUrl(movie.posterPath)) {
             placeholder(R.drawable.ic_movie_fallback)

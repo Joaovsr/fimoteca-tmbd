@@ -77,6 +77,8 @@ fun MoviesScreen(
     onClearFilters: () -> Unit = {},
     onRetryGenres: () -> Unit = {},
     onMovieClick: (Long) -> Unit,
+    onFavoriteClick: (MovieUiModel) -> Unit = {},
+    onFavoritesClick: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     val requestKey = uiState.requestKey()
@@ -90,7 +92,17 @@ fun MoviesScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.movies_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.movies_title)) },
+                actions = {
+                    TextButton(
+                        onClick = onFavoritesClick,
+                        modifier = Modifier.semantics { testTag = "open-favorites" },
+                    ) { Text(stringResource(R.string.favorites_title)) }
+                },
+            )
+        },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             MoviesControls(
@@ -109,7 +121,7 @@ fun MoviesScreen(
                         onRetry = movies::retry,
                     )
                     is LoadState.NotLoading if movies.itemCount == 0 -> EmptyContent(uiState.isSearching)
-                    else -> MoviesListContent(movies, listState, refresh, onMovieClick)
+                    else -> MoviesListContent(movies, listState, refresh, onMovieClick, onFavoriteClick)
                 }
             }
         }
@@ -389,6 +401,7 @@ private fun MoviesListContent(
     listState: androidx.compose.foundation.lazy.LazyListState,
     refresh: LoadState,
     onMovieClick: (Long) -> Unit,
+    onFavoriteClick: (MovieUiModel) -> Unit,
 ) = LazyColumn(
     state = listState,
     contentPadding = PaddingValues(16.dp),
@@ -400,7 +413,13 @@ private fun MoviesListContent(
         AppendError(message = errorMessage(refresh.error), onRetry = movies::retry)
     }
     items(count = movies.itemCount, key = movies.itemKey(MovieUiModel::id)) { index ->
-        movies[index]?.let { movie -> MovieCard(movie = movie, onClick = { onMovieClick(movie.id) }) }
+        movies[index]?.let { movie ->
+            MovieCard(
+                movie = movie,
+                onClick = { onMovieClick(movie.id) },
+                onFavoriteClick = { onFavoriteClick(movie) },
+            )
+        }
     }
     when (val append = movies.loadState.append) {
         is LoadState.Loading -> item { AppendLoading() }
@@ -410,7 +429,7 @@ private fun MoviesListContent(
 }
 
 @Composable
-private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit) {
+private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit, onFavoriteClick: () -> Unit) {
     val title = movie.title.ifBlank { stringResource(R.string.movie_title_unavailable) }
     Card(
         onClick = onClick,
@@ -431,9 +450,15 @@ private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit) {
                 ),
             )
             Spacer(Modifier.size(16.dp))
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 Text(movie.releaseDate ?: stringResource(R.string.movie_date_unavailable), style = MaterialTheme.typography.bodyMedium)
+                TextButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier.semantics { testTag = "movie-favorite-${movie.id}" },
+                ) {
+                    Text(stringResource(if (movie.isFavorite) R.string.favorite_remove else R.string.favorite_save))
+                }
             }
         }
     }

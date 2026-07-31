@@ -31,6 +31,9 @@ class MoviesFragment : Fragment() {
                             Bundle().apply { putLong("movieId", movieId) },
                         )
                     },
+                    onFavoritesClick = {
+                        findNavController().navigate(R.id.action_moviesFragment_to_favoritesFragment)
+                    },
                 )
             }
         }

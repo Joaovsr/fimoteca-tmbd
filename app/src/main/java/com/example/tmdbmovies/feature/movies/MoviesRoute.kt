@@ -5,7 +5,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 
 @Composable
-fun MoviesRoute(viewModel: MoviesViewModel, onMovieClick: (Long) -> Unit) {
+fun MoviesRoute(
+    viewModel: MoviesViewModel,
+    onMovieClick: (Long) -> Unit,
+    onFavoritesClick: () -> Unit,
+) {
     MoviesScreen(
         movies = viewModel.movies.collectAsLazyPagingItems(),
         uiState = viewModel.state.collectAsStateWithLifecycle().value,
@@ -14,5 +18,7 @@ fun MoviesRoute(viewModel: MoviesViewModel, onMovieClick: (Long) -> Unit) {
         onClearFilters = viewModel::clearFilters,
         onRetryGenres = viewModel::retryGenres,
         onMovieClick = onMovieClick,
+        onFavoriteClick = viewModel::onFavoriteClick,
+        onFavoritesClick = onFavoritesClick,
     )
 }

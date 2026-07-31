@@ -39,6 +39,15 @@
                 android:layout_marginTop="8dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/favorite_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="12dp"
+                android:minHeight="48dp"
+                android:text="@string/favorite_save" />
+
             <TextView
                 android:id="@+id/movie_overview"
                 android:layout_width="match_parent"
