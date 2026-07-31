@@ -6,9 +6,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 1 — Bootstrap implementada e validada por build, testes e lint; abertura em dispositivo ainda não verificada.
+**Fase atual:** Fase 2 — Núcleo de rede e descoberta concluída; próximo incremento é a Fase 3 — Lista paginada.
 
-**Código Android:** módulo único `app` inicializado com Activity, NavHost, destinos placeholder, Material 3 e Koin.
+**Código Android:** módulo único `app` com bootstrap de UI/navegação e núcleo remoto de descoberta integrado ao Koin; os destinos ainda são placeholders.
 
 ## Decisões confirmadas
 
@@ -28,11 +28,13 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Pesquisa e filtros seguem a política descrita em `docs/context/TMDB_API.md`.
 - Dependências de código seguem `UI → domínio ← dados`; `PagingData` é a única exceção AndroidX aceita no contrato de domínio.
 - Operações não paginadas usam falhas tipadas por `AppResult`/`AppError`.
+- O contrato inicial de `MovieRepository` expõe `pagedMovies(query, filters)` sem implementação; `Pager`, `PagingSource` e repository concreto pertencem à Fase 3.
+- OkHttp permanece em `4.12.0`, a versão resolvida pelo Retrofit `3.0.0`; não há logging HTTP nesta fase.
 - Subagentes reportam progresso; somente o agente principal consolida este arquivo.
 
 ## Próxima ação
 
-Abrir o app em dispositivo/emulador para concluir a validação manual da **Fase 1**. Depois, iniciar a **Fase 2 — Núcleo de rede e descoberta** de `docs/execution/PLAN.md`.
+Iniciar a **Fase 3 — Lista paginada** de `docs/execution/PLAN.md`, implementando primeiro `PagingSource` e repository e validando esses contratos antes da UI.
 
 ## Escolhas provisórias do bootstrap
 
@@ -47,7 +49,7 @@ Não bloqueie a implementação por essas escolhas; elas podem ser renomeadas an
 
 ## Riscos conhecidos
 
-- O ambiente atual não fornece `adb` ou dispositivo/emulador; a inicialização em runtime ainda precisa de verificação manual.
+- O placeholder Compose da lista ainda não trata window insets e aparece sob a barra de status; corrigir junto à primeira implementação real da tela.
 - Os endpoints search e discover não aceitam exatamente o mesmo conjunto de filtros; a UI não pode sugerir que filtros incompatíveis foram aplicados globalmente.
 - A disponibilidade do modelo configurado para subagentes depende do ambiente do usuário; remova ou substitua a linha de modelo caso necessário.
 
@@ -62,11 +64,17 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Pendente: executar a Fase 1 e validar a baseline no primeiro build.
 - Evidência: skills e perfis validados estruturalmente; Gradle ainda não existe.
 
-2026-07-31 — Fase 1 implementada
+2026-07-31 — Fase 1 concluída
 - Concluído: projeto Gradle, módulo app, catálogo de versões, Compose/Material 3, Koin, Activity, NavHost, destinos placeholder e configuração local segura do token.
 - Decidido: Lifecycle ajustado de 2.11.0 para 2.10.0 para preservar compileSdk 36; KSP/Room validados por código exclusivo de teste.
-- Pendente: abrir o app em dispositivo/emulador; depois iniciar a Fase 2.
-- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou; 2 testes passaram e lint terminou com 0 erros.
+- Pendente: corrigir window insets ao implementar a tela real da lista; iniciar a Fase 2.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou; 2 testes passaram; lint terminou com 0 erros; APK instalado no AVD Pixel_9 e `MainActivity` abriu sem crash em cold start de 1.349 ms.
+
+2026-07-31 — Fase 2 concluída
+- Concluído: domínio mínimo da lista, contrato paginado, Retrofit/OkHttp/serialization, autenticação Bearer, endpoint discover, DTOs, mapeadores e hierarquia de erros integrados ao Koin.
+- Decidido: manter `PagingSource`, `Pager` e implementação do repository para a Fase 3; fixar OkHttp 4.12.0, alinhado à dependência transitiva do Retrofit 3.0.0; não adicionar logger HTTP.
+- Pendente: implementar a Fase 3 e corrigir window insets junto à tela real da lista.
+- Evidência: `./gradlew testDebugUnitTest` passou com 8 testes; `./gradlew assembleDebug lintDebug` passou com 0 erros; chamada Retrofit simulada validou parsing, mapeamento, query e headers sem segredo real.
 ```
 
 Use este formato para entradas futuras:

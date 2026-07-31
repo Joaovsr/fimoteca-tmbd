@@ -1,0 +1,27 @@
+{
+  "page": 2,
+  "results": [
+    {
+      "id": 101,
+      "title": "  Filme válido  ",
+      "overview": "",
+      "poster_path": "poster.jpg",
+      "backdrop_path": null,
+      "release_date": "",
+      "vote_average": 7.4,
+      "genre_ids": [12, 18],
+      "unknown_field": "ignored"
+    },
+    {
+      "id": 202,
+      "title": null,
+      "release_date": "not-a-date"
+    },
+    {
+      "title": "Sem identificador"
+    }
+  ],
+  "total_pages": 8,
+  "total_results": 143,
+  "unknown_top_level": true
+}

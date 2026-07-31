@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -67,7 +68,15 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
 
+    implementation(libs.androidx.paging.common)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlinx.serialization)
+
     testImplementation(libs.androidx.room.runtime)
     testImplementation(libs.junit)
+    testImplementation(libs.okhttp.mockwebserver)
     kspTest(libs.androidx.room.compiler)
 }
