@@ -2,6 +2,7 @@ package com.example.tmdbmovies.data.remote
 
 import com.example.tmdbmovies.core.network.TmdbAuthInterceptor
 import com.example.tmdbmovies.data.remote.dto.MovieDto
+import com.example.tmdbmovies.data.remote.dto.GenreListDto
 import com.example.tmdbmovies.data.remote.dto.PagedResponseDto
 import com.example.tmdbmovies.data.remote.mapper.toRemoteMoviePage
 import kotlinx.coroutines.runBlocking
@@ -105,6 +106,48 @@ class DiscoverMoviesParsingTest {
         assertEquals(3, response.results.size)
         assertNull(response.results[1].title)
         assertNull(response.results[2].id)
+    }
+
+    @Test
+    fun `genre endpoint parses valid values and uses app language`() = runBlocking {
+        val genresFixture = requireNotNull(javaClass.classLoader?.getResource("fixtures/genres.json")).readText()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody(genresFixture),
+        )
+
+        val response = createApi(" ").genres()
+        val request = server.takeRequest()
+
+        assertEquals("/3/genre/movie/list", request.requestUrl?.encodedPath)
+        assertEquals("pt-BR", request.requestUrl?.queryParameter("language"))
+        assertEquals(3, response.genres.size)
+        assertNull(request.getHeader("Authorization"))
+        assertEquals(28L, json.decodeFromString<GenreListDto>(genresFixture).genres.first().id)
+    }
+
+    @Test
+    fun `search sends only query pagination and compatible year parameters`() = runBlocking {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""{"page":1,"results":[],"total_pages":0,"total_results":0}"""),
+        )
+
+        createApi(" ").searchMovies(query = "Alien", page = 3, releaseYear = 1979)
+        val request = server.takeRequest()
+
+        assertEquals("/3/search/movie", request.requestUrl?.encodedPath)
+        assertEquals("Alien", request.requestUrl?.queryParameter("query"))
+        assertEquals("3", request.requestUrl?.queryParameter("page"))
+        assertEquals("1979", request.requestUrl?.queryParameter("primary_release_year"))
+        assertEquals("false", request.requestUrl?.queryParameter("include_adult"))
+        assertNull(request.requestUrl?.queryParameter("sort_by"))
+        assertNull(request.requestUrl?.queryParameter("with_genres"))
+        assertNull(request.requestUrl?.queryParameter("vote_average.gte"))
     }
 
     private fun createApi(accessToken: String): TmdbApi {

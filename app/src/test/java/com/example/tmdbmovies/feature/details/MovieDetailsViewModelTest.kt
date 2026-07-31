@@ -9,6 +9,7 @@ import com.example.tmdbmovies.core.common.AppResult
 import com.example.tmdbmovies.domain.model.Movie
 import com.example.tmdbmovies.domain.model.MovieDetails
 import com.example.tmdbmovies.domain.model.MovieFilters
+import com.example.tmdbmovies.domain.model.Genre
 import com.example.tmdbmovies.domain.repository.MovieRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -88,6 +89,8 @@ class MovieDetailsViewModelTest {
         val requests = mutableListOf<Long>()
 
         override fun pagedMovies(query: String, filters: MovieFilters): Flow<PagingData<Movie>> = emptyFlow()
+
+        override suspend fun genres(): AppResult<List<Genre>> = AppResult.Success(emptyList())
 
         override suspend fun movieDetails(movieId: Long): AppResult<MovieDetails> {
             requests += movieId

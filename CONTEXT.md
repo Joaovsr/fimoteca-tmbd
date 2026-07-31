@@ -6,9 +6,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 5 — Pesquisa e filtros é a próxima fase a implementar; a Fase 4 foi concluída com testes unitários e instrumentados no AVD.
+**Fase atual:** Fase 6 — Favoritos com Room é a próxima fase a implementar; a Fase 5 foi concluída com testes unitários, instrumentados e validação manual no AVD.
 
-**Código Android:** módulo único `app` com descoberta paginada real em Compose, detalhes reais em Fragment XML, Retrofit/Paging/Coil e navegação por ID; pesquisa, filtros e favoritos ainda não foram implementados.
+**Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, Retrofit/Paging/Coil e navegação por ID; favoritos ainda não foram implementados.
 
 ## Decisões confirmadas
 
@@ -29,10 +29,13 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Dependências de código seguem `UI → domínio ← dados`; `PagingData` é a única exceção AndroidX aceita no contrato de domínio.
 - Operações não paginadas usam falhas tipadas por `AppResult`/`AppError`.
 - `MovieRepository.pagedMovies(query, filters)` é implementado por `TmdbMovieRepository` com `Pager` remoto de 20 itens, sem placeholders e sem `RemoteMediator`.
-- A Fase 3 aceita somente consulta vazia; query não vazia falha explicitamente até o endpoint search ser implementado na Fase 5.
 - Falhas paginadas chegam à UI como `AppErrorException`, preservando a categoria `AppError` e a causa técnica sem exibir mensagem bruta.
 - `MoviesViewModel` transforma domínio em `MovieUiModel`, usa `cachedIn(viewModelScope)` e deixa loading/erro/retry sob responsabilidade dos `LoadState` do Paging.
 - A tela da lista trata refresh/append loading e erro, vazio, conteúdo, retry, fallback de imagem/data, insets seguros e navegação apenas com `movieId`.
+- Consulta vazia usa `discover/movie` com gênero, ordenação, nota mínima e ano; consulta preenchida usa `search/movie` somente com texto e ano, conforme política explícita de compatibilidade no domínio.
+- `MoviesViewModel` preserva consulta e filtros no `SavedStateHandle`, aplica debounce de 400 ms, cancela fluxos obsoletos com `flatMapLatest` e cria uma nova geração de Paging por requisição efetiva.
+- Gêneros vêm de `genre/movie/list` como `AppResult`, com loading, erro independente e retry; a UI mantém filtros exclusivos de descoberta ocultos/inativos durante pesquisa sem apagá-los.
+- A tela Compose oferece busca/limpar, filtros de gênero, ordenação, nota mínima e ano, chips removíveis, limpar todos e retorno ao topo quando a requisição efetiva muda.
 - `MovieRepository.movieDetails(movieId)` consulta `GET movie/{movie_id}` em `pt-BR`, converte DTO em `MovieDetails` e entrega falhas tipadas por `AppResult`.
 - `MovieDetailsViewModel` recebe o ID por `SavedStateHandle`, expõe um único `LiveData<MovieDetailsUiState>` e preserva conteúdo durante recriação da Activity.
 - `MovieDetailsFragment` usa view binding, observa com `viewLifecycleOwner` e renderiza loading, erro recuperável, conteúdo, fallbacks de título/sinopse/data/imagem e retry.
@@ -44,7 +47,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Próxima ação
 
-Implementar a **Fase 5 — Pesquisa e filtros**: endpoints de search e gêneros, política de filtros por endpoint, debounce/cancelamento, novo Pager por consulta/filtro e UI com preservação de estado.
+Implementar a **Fase 6 — Favoritos com Room**: banco/DAO/mapeadores, repositório local, favoritar/desfavoritar em lista e detalhes e tela Compose de favoritos com persistência e testes instrumentados.
 
 ## Escolhas provisórias do bootstrap
 
@@ -59,7 +62,6 @@ Não bloqueie a implementação por essas escolhas; elas podem ser renomeadas an
 
 ## Riscos conhecidos
 
-- Os endpoints search e discover não aceitam exatamente o mesmo conjunto de filtros; a UI não pode sugerir que filtros incompatíveis foram aplicados globalmente.
 - A disponibilidade do modelo configurado para subagentes depende do ambiente do usuário; remova ou substitua a linha de modelo caso necessário.
 
 ## Registro de progresso
@@ -96,6 +98,12 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: mapear HTTP 404 como `AppError.NotFound`; manter favoritos fora desta fase; usar Coil Views para o pôster XML e `core-testing` apenas em testes de LiveData.
 - Pendente: iniciar a Fase 5 — Pesquisa e filtros; validar manualmente detalhes reais, modo avião, paisagem, fonte ampliada e filme sem metadados durante o polimento/checklist final.
 - Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 23 testes unitários, lint sem erros e 4 testes instrumentados no Pixel_9/API 37, incluindo erro/retry/conteúdo/recriação do Fragment XML.
+
+2026-07-31 — Fase 5 concluída
+- Concluído: endpoints e paginação de pesquisa, gêneros, política de filtros por endpoint, três ordenações, debounce/cancelamento, estado preservado e UI Compose de busca/filtros com limpar, chips, vazio, erro e retry.
+- Decidido: centralizar compatibilidade em `MovieFilters.compatibleWithQuery`; manter gênero/ordenação/nota como preferências latentes durante pesquisa e aplicar somente ano no `search/movie`; usar debounce de 400 ms.
+- Pendente: iniciar a Fase 6 — Favoritos com Room; validar manualmente rotação, digitação rápida, combinações de filtros e fonte ampliada durante o polimento/checklist final.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 36 testes unitários, lint sem erros e 8 testes instrumentados no Pixel_9/API 37; descoberta e pesquisa real por “Alien” foram validadas manualmente no AVD.
 ```
 
 Use este formato para entradas futuras:

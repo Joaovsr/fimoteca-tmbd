@@ -1,0 +1,7 @@
+{
+  "genres": [
+    {"id": 28, "name": " Ação "},
+    {"id": null, "name": "Sem id"},
+    {"id": 35, "name": "   "}
+  ]
+}

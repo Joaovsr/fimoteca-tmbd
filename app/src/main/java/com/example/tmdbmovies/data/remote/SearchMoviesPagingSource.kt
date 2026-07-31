@@ -6,25 +6,22 @@ import com.example.tmdbmovies.core.common.AppErrorException
 import com.example.tmdbmovies.core.network.toAppError
 import com.example.tmdbmovies.data.remote.mapper.toRemoteMoviePage
 import com.example.tmdbmovies.domain.model.Movie
-import com.example.tmdbmovies.domain.model.MovieFilters
-import com.example.tmdbmovies.domain.model.MovieSortOrder
 import kotlinx.coroutines.CancellationException
 
-internal class DiscoverMoviesPagingSource(
+internal class SearchMoviesPagingSource(
     private val api: TmdbApi,
-    private val filters: MovieFilters,
+    private val query: String,
+    private val releaseYear: Int?,
 ) : PagingSource<Int, Movie>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
         val requestedPage = params.key ?: FIRST_PAGE
 
         return try {
             val response =
-                api.discoverMovies(
+                api.searchMovies(
+                    query = query,
                     page = requestedPage,
-                    sortBy = filters.sortOrder.toTmdbValue(),
-                    genreId = filters.genreId,
-                    minimumRating = filters.minimumRating,
-                    releaseYear = filters.releaseYear,
+                    releaseYear = releaseYear,
                 ).toRemoteMoviePage()
 
             LoadResult.Page(
@@ -47,13 +44,6 @@ internal class DiscoverMoviesPagingSource(
             state.closestPageToPosition(anchorPosition)?.let { closestPage ->
                 closestPage.prevKey?.plus(1) ?: closestPage.nextKey?.minus(1)
             }
-        }
-
-    private fun MovieSortOrder.toTmdbValue(): String =
-        when (this) {
-            MovieSortOrder.PopularityDescending -> "popularity.desc"
-            MovieSortOrder.ReleaseDateDescending -> "primary_release_date.desc"
-            MovieSortOrder.VoteAverageDescending -> "vote_average.desc"
         }
 
     private companion object {

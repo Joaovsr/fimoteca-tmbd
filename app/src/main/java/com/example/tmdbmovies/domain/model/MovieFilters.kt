@@ -9,4 +9,13 @@ data class MovieFilters(
 
 enum class MovieSortOrder {
     PopularityDescending,
+    ReleaseDateDescending,
+    VoteAverageDescending,
 }
+
+fun MovieFilters.compatibleWithQuery(query: String): MovieFilters =
+    if (query.isBlank()) this else copy(
+        genreId = null,
+        sortOrder = MovieSortOrder.PopularityDescending,
+        minimumRating = null,
+    )

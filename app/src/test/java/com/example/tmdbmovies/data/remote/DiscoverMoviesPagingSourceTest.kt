@@ -7,6 +7,7 @@ import com.example.tmdbmovies.core.common.AppError
 import com.example.tmdbmovies.core.common.AppErrorException
 import com.example.tmdbmovies.data.remote.dto.MovieDto
 import com.example.tmdbmovies.data.remote.dto.MovieDetailsDto
+import com.example.tmdbmovies.data.remote.dto.GenreListDto
 import com.example.tmdbmovies.data.remote.dto.PagedResponseDto
 import com.example.tmdbmovies.domain.model.Movie
 import com.example.tmdbmovies.domain.model.MovieFilters
@@ -179,6 +180,16 @@ class DiscoverMoviesPagingSourceTest {
 
         override suspend fun movieDetails(movieId: Long, language: String): MovieDetailsDto =
             error("Details are not used by paging tests")
+
+        override suspend fun searchMovies(
+            query: String,
+            page: Int,
+            language: String,
+            includeAdult: Boolean,
+            releaseYear: Int?,
+        ): PagedResponseDto<MovieDto> = error("Search is not used by discover paging tests")
+
+        override suspend fun genres(language: String): GenreListDto = error("Genres are not used by paging tests")
     }
 
     private companion object {

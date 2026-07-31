@@ -4,6 +4,7 @@ import com.example.tmdbmovies.core.common.AppError
 import com.example.tmdbmovies.core.common.AppResult
 import com.example.tmdbmovies.data.remote.TmdbApi
 import com.example.tmdbmovies.data.remote.dto.MovieDetailsDto
+import com.example.tmdbmovies.data.remote.dto.GenreListDto
 import com.example.tmdbmovies.data.remote.dto.MovieDto
 import com.example.tmdbmovies.data.remote.dto.PagedResponseDto
 import java.io.IOException
@@ -53,5 +54,15 @@ class TmdbMovieDetailsRepositoryTest {
             minimumRating: Double?,
             releaseYear: Int?,
         ): PagedResponseDto<MovieDto> = error("Discover is not used by details tests")
+
+        override suspend fun searchMovies(
+            query: String,
+            page: Int,
+            language: String,
+            includeAdult: Boolean,
+            releaseYear: Int?,
+        ): PagedResponseDto<MovieDto> = error("Search is not used by details tests")
+
+        override suspend fun genres(language: String): GenreListDto = error("Genres are not used by details tests")
     }
 }
