@@ -17,7 +17,7 @@ Este repositório foi preparado para desenvolvimento assistido por agentes de IA
 ## Decisões principais
 
 - **Módulo único:** suficiente para o tamanho do desafio e mais fácil de avaliar.
-- **Arquitetura em camadas:** UI → domínio → dados, com modelos separados por fronteira.
+- **Arquitetura em camadas:** a UI chama contratos de domínio implementados por dados; no código, UI e dados dependem do domínio.
 - **UI híbrida intencional:**
   - lista, pesquisa, filtros e favoritos em Jetpack Compose;
   - detalhes em `Fragment` com layout XML;

@@ -1,0 +1,6 @@
+[agents]
+max_concurrent_threads_per_session = 4
+# Modelo econômico para leitura, planejamento e tarefas delimitadas.
+# Remova ou substitua se este nome não estiver disponível no seu ambiente.
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "medium"
