@@ -6,9 +6,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 2 — Núcleo de rede e descoberta concluída; próximo incremento é a Fase 3 — Lista paginada.
+**Fase atual:** Fase 4 — Detalhes em XML é a próxima fase a implementar; a Fase 3 foi concluída após validação manual da lista paginada no AVD.
 
-**Código Android:** módulo único `app` com bootstrap de UI/navegação e núcleo remoto de descoberta integrado ao Koin; os destinos ainda são placeholders.
+**Código Android:** módulo único `app` com descoberta paginada real em Compose, Retrofit/Paging/Coil e navegação por ID; detalhes e favoritos ainda são placeholders.
 
 ## Decisões confirmadas
 
@@ -28,13 +28,20 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Pesquisa e filtros seguem a política descrita em `docs/context/TMDB_API.md`.
 - Dependências de código seguem `UI → domínio ← dados`; `PagingData` é a única exceção AndroidX aceita no contrato de domínio.
 - Operações não paginadas usam falhas tipadas por `AppResult`/`AppError`.
-- O contrato inicial de `MovieRepository` expõe `pagedMovies(query, filters)` sem implementação; `Pager`, `PagingSource` e repository concreto pertencem à Fase 3.
+- `MovieRepository.pagedMovies(query, filters)` é implementado por `TmdbMovieRepository` com `Pager` remoto de 20 itens, sem placeholders e sem `RemoteMediator`.
+- A Fase 3 aceita somente consulta vazia; query não vazia falha explicitamente até o endpoint search ser implementado na Fase 5.
+- Falhas paginadas chegam à UI como `AppErrorException`, preservando a categoria `AppError` e a causa técnica sem exibir mensagem bruta.
+- `MoviesViewModel` transforma domínio em `MovieUiModel`, usa `cachedIn(viewModelScope)` e deixa loading/erro/retry sob responsabilidade dos `LoadState` do Paging.
+- A tela da lista trata refresh/append loading e erro, vazio, conteúdo, retry, fallback de imagem/data, insets seguros e navegação apenas com `movieId`.
+- O manifesto declara `android.permission.INTERNET`; sua ausência causava o encerramento do processo quando o OkHttp iniciava a primeira chamada à TMDB.
+- AndroidX Test foi ajustado para `ext.junit 1.3.0` e Espresso `3.7.0`; o Espresso 3.6.1 era incompatível com Android 17 por usar `InputManager.getInstance` via reflexão.
 - OkHttp permanece em `4.12.0`, a versão resolvida pelo Retrofit `3.0.0`; não há logging HTTP nesta fase.
+- No Android Studio, o Gradle JDK deve usar o Embedded JDK em `/Applications/Android Studio.app/Contents/jbr/Contents/Home`; a referência local `jbr-25` estava indefinida.
 - Subagentes reportam progresso; somente o agente principal consolida este arquivo.
 
 ## Próxima ação
 
-Iniciar a **Fase 3 — Lista paginada** de `docs/execution/PLAN.md`, implementando primeiro `PagingSource` e repository e validando esses contratos antes da UI.
+Implementar a **Fase 4 — Detalhes em XML**: endpoint e mapeamento de detalhes, repository, `MovieDetailsViewModel` com LiveData, Fragment com view binding e estados de loading, erro, conteúdo e retry.
 
 ## Escolhas provisórias do bootstrap
 
@@ -49,7 +56,6 @@ Não bloqueie a implementação por essas escolhas; elas podem ser renomeadas an
 
 ## Riscos conhecidos
 
-- O placeholder Compose da lista ainda não trata window insets e aparece sob a barra de status; corrigir junto à primeira implementação real da tela.
 - Os endpoints search e discover não aceitam exatamente o mesmo conjunto de filtros; a UI não pode sugerir que filtros incompatíveis foram aplicados globalmente.
 - A disponibilidade do modelo configurado para subagentes depende do ambiente do usuário; remova ou substitua a linha de modelo caso necessário.
 
@@ -75,6 +81,12 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: manter `PagingSource`, `Pager` e implementação do repository para a Fase 3; fixar OkHttp 4.12.0, alinhado à dependência transitiva do Retrofit 3.0.0; não adicionar logger HTTP.
 - Pendente: implementar a Fase 3 e corrigir window insets junto à tela real da lista.
 - Evidência: `./gradlew testDebugUnitTest` passou com 8 testes; `./gradlew assembleDebug lintDebug` passou com 0 erros; chamada Retrofit simulada validou parsing, mapeamento, query e headers sem segredo real.
+
+2026-07-31 — Fase 3 concluída
+- Concluído: `PagingSource`, repository/Pager, Koin, ViewModel, tela Compose da lista, cards Coil, seis estados de Paging, retry, fallbacks, insets seguros, navegação por `movieId` e validação manual da lista real no AVD.
+- Decidido: não duplicar `LoadState` no ViewModel; manter busca/filtros completos para a Fase 5; atualizar AndroidX Test para ext.junit 1.3.0 e Espresso 3.7.0 por compatibilidade com Android 17; declarar `android.permission.INTERNET` no manifesto.
+- Pendente: iniciar a Fase 4 — Detalhes em XML.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou com 17 testes unitários e lint sem erros; `./gradlew connectedDebugAndroidTest` passou com 3 testes Compose no Pixel_9/API 37; Logcat identificou a ausência da permissão de internet, a correção compilou com sucesso e a lista de filmes foi confirmada manualmente no AVD.
 ```
 
 Use este formato para entradas futuras:

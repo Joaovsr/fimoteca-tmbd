@@ -2,7 +2,16 @@
 <resources>
     <string name="app_name">TMDB Movies</string>
     <string name="movies_title">Movies</string>
-    <string name="movies_placeholder">Movies will appear here.</string>
+    <string name="movies_empty">No movies found.</string>
+    <string name="movie_title_unavailable">Untitled movie</string>
+    <string name="movie_date_unavailable">Release date unavailable</string>
+    <string name="movie_poster_content_description">Poster for %1$s</string>
+    <string name="retry">Try again</string>
+    <string name="error_no_connection">Check your connection and try again.</string>
+    <string name="error_timeout">The request took too long. Try again.</string>
+    <string name="error_unauthorized">Movie service configuration is unavailable.</string>
+    <string name="error_rate_limited">Too many requests. Please try again shortly.</string>
+    <string name="error_generic">We could not load movies. Try again.</string>
     <string name="details_title">Movie details</string>
     <string name="details_placeholder">Movie details will appear here.</string>
     <string name="favorites_title">Favorites</string>
