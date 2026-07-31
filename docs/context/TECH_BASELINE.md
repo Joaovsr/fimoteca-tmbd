@@ -26,7 +26,7 @@ Com AGP 9, não aplique automaticamente `org.jetbrains.kotlin.android`. O suport
 | Biblioteca | Baseline | Uso |
 |---|---:|---|
 | Compose BOM | 2026.06.00 | versões coordenadas do Compose |
-| Lifecycle | 2.11.0 | ViewModel, LiveData e coleta lifecycle-aware |
+| Lifecycle | 2.10.0 | ViewModel, LiveData e coleta lifecycle-aware; 2.11.0 exige compileSdk 37 |
 | Navigation | 2.9.8 | Navigation Component/Fragments |
 | Paging | 3.5.0 | paginação e integração Compose |
 | Room | 2.8.4 | favoritos locais |

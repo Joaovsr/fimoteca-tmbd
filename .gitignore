@@ -1,7 +1,9 @@
 .env
 .DS_Store
 local.properties
+.kotlin/
 .gradle/
 .idea/
 build/
+**/build/
 *.iml

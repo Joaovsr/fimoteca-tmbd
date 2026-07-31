@@ -45,9 +45,10 @@ As versões das bibliotecas estão em [`docs/context/TECH_BASELINE.md`](docs/con
 ## Configuração da API
 
 1. Crie uma conta no TMDB e gere um **API Read Access Token**.
-2. Adicione ao arquivo local `local.properties`:
+2. Copie `local.properties.example` para `local.properties` e substitua os caminhos/valores locais:
 
 ```properties
+sdk.dir=/caminho/absoluto/para/Android/sdk
 TMDB_ACCESS_TOKEN=seu_token_aqui
 ```
 

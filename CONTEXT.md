@@ -6,15 +6,16 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 0 concluída; próximo incremento é a Fase 1 — Bootstrap.
+**Fase atual:** Fase 1 — Bootstrap implementada e validada por build, testes e lint; abertura em dispositivo ainda não verificada.
 
-**Código Android:** ainda não inicializado.
+**Código Android:** módulo único `app` inicializado com Activity, NavHost, destinos placeholder, Material 3 e Koin.
 
 ## Decisões confirmadas
 
 - Aplicativo Android nativo em Kotlin.
 - Um único módulo `app` na primeira versão.
 - `minSdk 23`, `compileSdk 36`, `targetSdk 36`, JDK 17.
+- Lifecycle fixado em `2.10.0`, pois `2.11.0` exige `compileSdk` 37 e conflita com a baseline de API 36.
 - Uma única Activity com navegação entre Fragments.
 - Lista, pesquisa, filtros e favoritos em Compose hospedado por `ComposeView`.
 - Detalhes do filme em Fragment com layout XML.
@@ -31,16 +32,9 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Próxima ação
 
-Executar a **Fase 1 — Bootstrap** de `docs/execution/PLAN.md`:
+Abrir o app em dispositivo/emulador para concluir a validação manual da **Fase 1**. Depois, iniciar a **Fase 2 — Núcleo de rede e descoberta** de `docs/execution/PLAN.md`.
 
-- criar projeto Gradle;
-- configurar catálogo de versões e plugins;
-- criar `Application`, `MainActivity` e grafo de navegação;
-- configurar Koin;
-- adicionar token local seguro;
-- provar build e testes vazios.
-
-## Pendências que exigem escolha no bootstrap
+## Escolhas provisórias do bootstrap
 
 Use valores provisórios consistentes caso o responsável não defina outros:
 
@@ -53,7 +47,7 @@ Não bloqueie a implementação por essas escolhas; elas podem ser renomeadas an
 
 ## Riscos conhecidos
 
-- Compatibilidade conjunta entre AGP 9.3, built-in Kotlin, KSP, Room e plugins deve ser validada pelo primeiro build.
+- O ambiente atual não fornece `adb` ou dispositivo/emulador; a inicialização em runtime ainda precisa de verificação manual.
 - Os endpoints search e discover não aceitam exatamente o mesmo conjunto de filtros; a UI não pode sugerir que filtros incompatíveis foram aplicados globalmente.
 - A disponibilidade do modelo configurado para subagentes depende do ambiente do usuário; remova ou substitua a linha de modelo caso necessário.
 
@@ -67,6 +61,12 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: contratos e ownership registrados acima.
 - Pendente: executar a Fase 1 e validar a baseline no primeiro build.
 - Evidência: skills e perfis validados estruturalmente; Gradle ainda não existe.
+
+2026-07-31 — Fase 1 implementada
+- Concluído: projeto Gradle, módulo app, catálogo de versões, Compose/Material 3, Koin, Activity, NavHost, destinos placeholder e configuração local segura do token.
+- Decidido: Lifecycle ajustado de 2.11.0 para 2.10.0 para preservar compileSdk 36; KSP/Room validados por código exclusivo de teste.
+- Pendente: abrir o app em dispositivo/emulador; depois iniciar a Fase 2.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou; 2 testes passaram e lint terminou com 0 erros.
 ```
 
 Use este formato para entradas futuras:

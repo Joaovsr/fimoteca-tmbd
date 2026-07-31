@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TMDB Movies</string>
+    <string name="movies_title">Movies</string>
+    <string name="movies_placeholder">Movies will appear here.</string>
+    <string name="details_title">Movie details</string>
+    <string name="details_placeholder">Movie details will appear here.</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="favorites_placeholder">Favorite movies will appear here.</string>
+</resources>
