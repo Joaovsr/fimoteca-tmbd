@@ -16,4 +16,6 @@ data class MovieDetailsUiModel(
     val overview: String?,
     val releaseDate: String?,
     val posterPath: String?,
+    val backdropPath: String?,
+    val voteAverage: Double?,
 )

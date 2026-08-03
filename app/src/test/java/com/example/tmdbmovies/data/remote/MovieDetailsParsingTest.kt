@@ -52,6 +52,7 @@ class MovieDetailsParsingTest {
         assertEquals("/poster.jpg", details.posterPath)
         assertNull(details.backdropPath)
         assertEquals("1999-10-15", details.releaseDate)
+        assertEquals(8.4, details.voteAverage)
     }
 
     @Test
@@ -65,6 +66,7 @@ class MovieDetailsParsingTest {
         assertNull(details.overview)
         assertNull(details.posterPath)
         assertNull(details.releaseDate)
+        assertNull(details.voteAverage)
     }
 
     private companion object {

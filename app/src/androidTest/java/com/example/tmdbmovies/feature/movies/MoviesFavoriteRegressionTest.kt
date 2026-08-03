@@ -37,21 +37,23 @@ class MoviesFavoriteRegressionTest {
         val viewModel = MoviesViewModel(FakeMovieRepository(movie), favorites, SavedStateHandle())
         composeRule.setContent {
             TmdbMoviesTheme {
-                MoviesRoute(viewModel, onMovieClick = {}, onFavoritesClick = {})
+                MoviesRoute(viewModel, onMovieClick = {})
             }
         }
 
         composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Remove favorite").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Remover dos favoritos").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithTag("movie-favorite-42").performClick()
 
-        composeRule.onNodeWithText("Save favorite").assertExists()
+        composeRule.onNodeWithText("Salvar como favorito").assertExists()
     }
 
     private class FakeMovieRepository(private val movie: Movie) : MovieRepository {
         override fun pagedMovies(query: String, filters: MovieFilters): Flow<PagingData<Movie>> =
             Pager(PagingConfig(pageSize = 20)) { SingleMoviePagingSource(movie) }.flow
+
+        override suspend fun movies(collection: com.example.tmdbmovies.domain.model.MovieCollection): AppResult<List<Movie>> = AppResult.Success(emptyList())
 
         override suspend fun genres(): AppResult<List<Genre>> = AppResult.Success(emptyList())
 

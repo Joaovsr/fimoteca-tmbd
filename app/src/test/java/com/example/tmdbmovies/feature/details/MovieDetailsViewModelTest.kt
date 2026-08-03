@@ -87,7 +87,9 @@ class MovieDetailsViewModelTest {
     @Test
     fun `favorite action persists details and room emission updates content`() = runTest(dispatcher) {
         val repository = FakeRepository(
-            mutableListOf(AppResult.Success(MovieDetails(42, "Movie", "Overview", "/poster", "/backdrop", "2026-07-31"))),
+            mutableListOf(
+                AppResult.Success(MovieDetails(42, "Movie", "Overview", "/poster", "/backdrop", "2026-07-31", 8.2)),
+            ),
         )
         val favorites = FakeFavoriteRepository()
         val viewModel = MovieDetailsViewModel(repository, favorites, SavedStateHandle(mapOf("movieId" to 42L)))
@@ -98,6 +100,7 @@ class MovieDetailsViewModelTest {
 
         val change = favorites.changes.single()
         assertEquals(42L, change.first.movieId)
+        assertEquals(8.2, change.first.voteAverage)
         assertTrue(change.second)
         assertTrue((viewModel.state.value as MovieDetailsUiState.Content).isFavorite)
     }
@@ -108,6 +111,8 @@ class MovieDetailsViewModelTest {
         val requests = mutableListOf<Long>()
 
         override fun pagedMovies(query: String, filters: MovieFilters): Flow<PagingData<Movie>> = emptyFlow()
+
+        override suspend fun movies(collection: com.example.tmdbmovies.domain.model.MovieCollection): AppResult<List<Movie>> = AppResult.Success(emptyList())
 
         override suspend fun genres(): AppResult<List<Genre>> = AppResult.Success(emptyList())
 

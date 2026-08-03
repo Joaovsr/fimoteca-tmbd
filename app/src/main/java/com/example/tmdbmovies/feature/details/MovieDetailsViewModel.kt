@@ -73,6 +73,8 @@ private fun MovieDetails.toUiModel() = MovieDetailsUiModel(
     overview = overview?.trim()?.takeIf(String::isNotEmpty),
     releaseDate = releaseDate?.trim()?.takeIf(String::isNotEmpty),
     posterPath = posterPath?.trim()?.takeIf(String::isNotEmpty),
+    backdropPath = backdropPath?.trim()?.takeIf(String::isNotEmpty),
+    voteAverage = voteAverage,
 )
 
 private fun MovieDetails.toFavoriteMovie() = Movie(
@@ -82,7 +84,7 @@ private fun MovieDetails.toFavoriteMovie() = Movie(
     posterPath = posterPath,
     backdropPath = backdropPath,
     releaseDate = releaseDate,
-    voteAverage = null,
+    voteAverage = voteAverage,
     genreIds = emptyList(),
 )
 

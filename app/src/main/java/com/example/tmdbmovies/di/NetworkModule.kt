@@ -3,6 +3,7 @@ package com.example.tmdbmovies.di
 import com.example.tmdbmovies.BuildConfig
 import com.example.tmdbmovies.core.network.TmdbAuthInterceptor
 import com.example.tmdbmovies.data.remote.TmdbApi
+import com.example.tmdbmovies.data.remote.TmdbEditorialApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -32,4 +33,5 @@ internal val networkModule = module {
             .build()
     }
     single<TmdbApi> { get<Retrofit>().create(TmdbApi::class.java) }
+    single<TmdbEditorialApi> { get<Retrofit>().create(TmdbEditorialApi::class.java) }
 }

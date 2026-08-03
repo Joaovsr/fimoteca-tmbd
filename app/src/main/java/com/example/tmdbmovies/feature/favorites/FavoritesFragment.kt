@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.example.tmdbmovies.R
 import com.example.tmdbmovies.core.ui.theme.TmdbMoviesTheme
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoritesFragment : Fragment() {
@@ -33,7 +34,18 @@ class FavoritesFragment : Fragment() {
                         )
                     },
                     onRemoveClick = viewModel::removeFavorite,
-                    onBackClick = { findNavController().navigateUp() },
+                    onQueryChanged = viewModel::onQueryChanged,
+                    onSortOrderChanged = viewModel::onSortOrderChanged,
+                    onExploreClick = {
+                        findNavController().navigate(
+                            R.id.moviesFragment,
+                            null,
+                            navOptions {
+                                popUpTo(R.id.moviesFragment) { inclusive = true }
+                                launchSingleTop = true
+                            },
+                        )
+                    },
                 )
             }
         }

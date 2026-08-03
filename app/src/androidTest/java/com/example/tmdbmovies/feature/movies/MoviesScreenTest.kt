@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.runtime.getValue
@@ -33,20 +35,20 @@ class MoviesScreenTest {
         composeRule.setContent { TmdbMoviesTheme { EmptyContent() } }
 
         composeRule.onNodeWithTag("movies-empty").assertExists()
-        composeRule.onNodeWithText("No movies found.").assertExists()
+        composeRule.onNodeWithText("Nenhum filme encontrado.").assertExists()
     }
 
     @Test
     fun searchEmptyContentHasSpecificMessage() {
         composeRule.setContent { TmdbMoviesTheme { EmptyContent(isSearching = true) } }
 
-        composeRule.onNodeWithText("No movies match this search.").assertExists()
+        composeRule.onNodeWithText("Nenhum filme corresponde a esta busca.").assertExists()
     }
 
     @Test
     fun movieCardShowsFallbackAndSendsOnlyMovieIdOnClick() {
         var selectedId: Long? = null
-        val movie = MovieUiModel(id = 42, title = "Movie title", releaseDate = null, posterPath = null)
+        val movie = MovieUiModel(id = 42, title = "Movie title", releaseDate = "1999-10-15", posterPath = null)
         composeRule.setContent {
             TmdbMoviesTheme {
                 val items = flowOf(PagingData.from(listOf(movie))).collectAsLazyPagingItems()
@@ -58,8 +60,9 @@ class MoviesScreenTest {
             composeRule.onAllNodesWithText("Movie title").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithTag("movie-poster-fallback", useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithContentDescription("Poster for Movie title").assertExists()
-        composeRule.onNodeWithTag("movie-card-42").performClick()
+        composeRule.onNodeWithContentDescription("Pôster de Movie title").assertExists()
+        composeRule.onNodeWithText("15/10/1999").assertExists()
+        composeRule.onNodeWithTag("movie-card-42").performSemanticsAction(SemanticsActions.OnClick)
 
         assertEquals(42L, selectedId)
     }
@@ -127,8 +130,8 @@ class MoviesScreenTest {
         composeRule.onNodeWithTag("filters-open").performClick()
         composeRule.onNodeWithTag("filter-year").performTextInput("2024")
         composeRule.onNodeWithTag("filters-apply").performClick()
-        composeRule.onNodeWithText("Year 2024").assertExists()
-        composeRule.onNodeWithText("Clear filters").performClick()
+        composeRule.onNodeWithText("Ano 2024").assertExists()
+        composeRule.onNodeWithText("Limpar filtros").performClick()
 
         assertEquals(MovieFilters(), latestFilters)
     }
@@ -162,10 +165,10 @@ class MoviesScreenTest {
             }
         }
 
-        composeRule.onNodeWithText("Year 1979").assertExists()
+        composeRule.onNodeWithText("Ano 1979").assertExists()
         composeRule.onNodeWithText("Drama").assertDoesNotExist()
         composeRule.onNodeWithText(
-            "Genre, sort and rating are saved for discovery but are not applied to search results.",
+            "Gênero, ordenação e nota ficam salvos para a descoberta, mas não são aplicados aos resultados da busca.",
         ).assertExists()
         composeRule.onNodeWithTag("filters-open").performClick()
         composeRule.onNodeWithTag("filter-year").performTextReplacement("1980")

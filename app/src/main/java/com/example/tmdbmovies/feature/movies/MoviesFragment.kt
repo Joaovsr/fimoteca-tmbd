@@ -20,20 +20,25 @@ class MoviesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
+        val searchMode = arguments?.getBoolean("searchMode") == true
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             TmdbMoviesTheme {
                 MoviesRoute(
                     viewModel = viewModel,
+                    searchMode = searchMode,
                     onMovieClick = { movieId ->
                         findNavController().navigate(
-                            R.id.action_moviesFragment_to_movieDetailsFragment,
+                            if (searchMode) {
+                                R.id.action_searchFragment_to_movieDetailsFragment
+                            } else {
+                                R.id.action_moviesFragment_to_movieDetailsFragment
+                            },
                             Bundle().apply { putLong("movieId", movieId) },
                         )
                     },
-                    onFavoritesClick = {
-                        findNavController().navigate(R.id.action_moviesFragment_to_favoritesFragment)
-                    },
+                    onSearchClick = { findNavController().navigate(R.id.action_moviesFragment_to_searchFragment) },
+                    onBackClick = { findNavController().navigateUp() },
                 )
             }
         }

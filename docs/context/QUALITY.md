@@ -45,11 +45,16 @@ Checklist antes da entrega:
 - rolagem até novas páginas;
 - nova busca enquanto a anterior está em andamento;
 - rotação/recriação;
-- tema claro e escuro;
+- tema escuro em modo normal e alto contraste; tema claro somente se a preferência entrar na fase;
 - fonte ampliada;
 - filme sem pôster, data ou sinopse;
 - persistência de favoritos após encerrar o processo;
 - TalkBack ou inspeção de acessibilidade nos fluxos principais.
+- Home com banner e carrosséis em rede rápida, lenta e offline;
+- grid de favoritos com 2 e 3 colunas, ordenação e remoção;
+- barra inferior nos três destinos principais e retorno correto em busca/detalhes;
+- contraste dos tokens de `docs/context/DESIGN_SYSTEM.md` e legibilidade sobre backdrops;
+- ausência de promessa de conta, assistidos ou séries antes dessas features existirem.
 
 ## Matriz por feature
 
@@ -60,6 +65,8 @@ Checklist antes da entrega:
 | Filtros | validação e recriação do Pager | chips/sheet e limpar | combinações suportadas |
 | Detalhes | repository e ViewModel | Fragment XML | campos ausentes |
 | Favoritos | repository | Room + UI | reinício do app |
+| Discover editorial | regras/fontes por seção | seções, favorito e navegação | carrosséis e imagens |
+| Perfil local | estado de preferências | navegação e conteúdo | créditos e links |
 
 ## Padrões de código
 
@@ -100,6 +107,10 @@ O revisor deve procurar:
 - Erro de append aparece inline e mantém itens carregados.
 - Placeholder evita salto excessivo de layout.
 - Texto suporta escala de fonte e não corta informação crítica.
+- Pôsteres preservam proporção 2:3 e espaço durante placeholder/erro.
+- Backdrops possuem gradiente suficiente sem esconder o assunto principal.
+- Grid, carrosséis e banner são verificados em retrato, paisagem e fonte a 200%.
+- Componentes e tokens seguem `docs/context/DESIGN_SYSTEM.md` sem literais visuais duplicados nas features.
 
 ## Gates por pull request ou fase
 

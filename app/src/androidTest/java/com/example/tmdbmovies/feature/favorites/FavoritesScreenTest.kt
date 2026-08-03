@@ -17,12 +17,12 @@ class FavoritesScreenTest {
     fun emptyStateIsVisible() {
         composeRule.setContent {
             TmdbMoviesTheme {
-                FavoritesScreen(FavoritesUiState(isLoading = false), {}, {}, {})
+                FavoritesScreen(FavoritesUiState(isLoading = false), {}, {})
             }
         }
 
         composeRule.onNodeWithTag("favorites-empty").assertExists()
-        composeRule.onNodeWithText("Your favorite movies will appear here.").assertExists()
+        composeRule.onNodeWithText("Os filmes marcados com um coração aparecerão aqui.").assertExists()
     }
 
     @Test
@@ -33,10 +33,9 @@ class FavoritesScreenTest {
         composeRule.setContent {
             TmdbMoviesTheme {
                 FavoritesScreen(
-                    FavoritesUiState(listOf(movie), isLoading = false),
+                    FavoritesUiState(movies = listOf(movie), totalCount = 1, isLoading = false),
                     onMovieClick = { selectedId = it },
                     onRemoveClick = { removedId = it },
-                    onBackClick = {},
                 )
             }
         }
@@ -46,5 +45,41 @@ class FavoritesScreenTest {
 
         assertEquals(42L, selectedId)
         assertEquals(42L, removedId)
+    }
+
+    @Test
+    fun emptyStateExploresMovies() {
+        var explored = false
+        composeRule.setContent {
+            TmdbMoviesTheme {
+                FavoritesScreen(
+                    FavoritesUiState(isLoading = false), {}, {},
+                    onExploreClick = { explored = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag("favorites-explore").performClick()
+        assertEquals(true, explored)
+    }
+
+    @Test
+    fun sortSheetShowsLocalOptions() {
+        composeRule.setContent {
+            TmdbMoviesTheme {
+                FavoritesScreen(
+                    FavoritesUiState(
+                        movies = listOf(
+                            FavoriteMovieUiModel(1, "One", null, null),
+                            FavoriteMovieUiModel(2, "Two", null, null),
+                        ),
+                        totalCount = 2,
+                        isLoading = false,
+                    ), {}, {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag("favorites-sort").performClick()
+        composeRule.onNodeWithText("Maior nota").assertExists()
     }
 }

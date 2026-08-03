@@ -3,5 +3,5 @@ package com.example.tmdbmovies.di
 import org.koin.dsl.module
 
 val appModule = module {
-    includes(networkModule, databaseModule, repositoryModule, moviesModule, detailsModule, favoritesModule)
+    includes(networkModule, databaseModule, repositoryModule, moviesModule, discoverModule, detailsModule, favoritesModule, profileModule)
 }

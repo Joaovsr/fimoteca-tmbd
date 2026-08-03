@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Entregar um aplicativo Android simples, funcional e demonstrável que permita descobrir filmes pelo TMDB, consultar detalhes e manter favoritos locais. A avaliação deve conseguir perceber arquitetura coerente, legibilidade, estado previsível, boa experiência e tratamento de falhas.
+Entregar um aplicativo Android simples, funcional e demonstrável que permita descobrir filmes pelo TMDB em uma Home editorial, consultar detalhes, pesquisar, manter favoritos locais e consultar um perfil local com preferências e créditos. A avaliação deve conseguir perceber arquitetura coerente, legibilidade, estado previsível, boa experiência e tratamento de falhas.
 
 ## Usuários e jornadas
 
@@ -18,6 +18,10 @@ Como usuário, quero abrir o aplicativo e ver filmes paginados para descobrir t�
 - Loading inicial, loading de próxima página, erro inicial, erro de próxima página, lista vazia e conteúdo são distinguíveis.
 - Há ação de tentar novamente após falha.
 - Filmes sem imagem ou data utilizam fallback visual/textual adequado.
+- A Home diferencia filme em destaque, em alta na semana, nos cinemas, clássicos e mais bem avaliados.
+- O destaque alterna automaticamente entre os cinco primeiros filmes em alta e também responde a deslize horizontal e seleção dos indicadores.
+- Cada seção possui fonte de dados e regra explícitas; “clássicos” não é apresentado como categoria oficial do TMDB.
+- O usuário consegue abrir um filme e alternar seu favorito a partir dos cards aplicáveis.
 
 ### 2. Pesquisar
 
@@ -76,10 +80,24 @@ Como usuário, quero salvar filmes para consultar depois, inclusive após fechar
 - Favoritos permanecem após reinício do processo.
 - Um favorito pode ser aberto na tela de detalhes.
 - A UI reage imediatamente à alteração sem depender de nova chamada remota.
+- A coleção usa grid adaptável, informa a quantidade e oferece ordenação local.
+- O estado vazio possui ação para retornar à descoberta.
+
+### 6. Consultar perfil local
+
+Como usuário, quero encontrar preferências e informações do aplicativo sem precisar criar uma conta.
+
+**Critérios de aceite**
+
+- A tela não sugere login ou sincronização com uma conta TMDB.
+- Exibe apenas estatísticas derivadas de dados realmente persistidos pelo app.
+- Exibe versão, créditos e atribuição obrigatória do TMDB.
+- Preferências apresentadas possuem efeito real e estado preservado quando aplicável.
 
 ## Requisitos de experiência
 
 - Material 3 e layout adaptável a celulares em retrato; paisagem não pode quebrar o conteúdo.
+- A direção visual e os componentes seguem `docs/context/DESIGN_SYSTEM.md`.
 - Feedback visual claro para toque, seleção de filtro e favorito.
 - Conteúdo acessível: contraste, área mínima de toque, descrições de imagens informativas e suporte a tamanho de fonte aumentado.
 - Mensagens de erro orientam a próxima ação sem expor stack trace ou código interno desnecessário.
@@ -97,11 +115,12 @@ Como usuário, quero salvar filmes para consultar depois, inclusive após fechar
 ## Fora do escopo da primeira versão
 
 - Login de usuário e sincronização de favoritos com conta TMDB.
+- Séries na primeira entrega da nova Home; sua inclusão será uma evolução final após o quality gate de filmes.
 - Reprodução de trailers.
 - Avaliações, listas personalizadas ou recomendações.
 - Download offline de imagens.
 - Cache completo do catálogo com `RemoteMediator`.
-- Multi-módulo, design system próprio ou arquitetura multiplataforma.
+- Multi-módulo, biblioteca/módulo próprio de design system ou arquitetura multiplataforma. Uma especificação visual e componentes compartilhados mínimos em `core/ui` continuam permitidos.
 - Analytics, push notification e publicação em loja.
 
 ## Critério de entrega
