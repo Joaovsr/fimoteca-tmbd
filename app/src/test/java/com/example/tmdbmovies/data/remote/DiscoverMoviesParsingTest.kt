@@ -150,6 +150,39 @@ class DiscoverMoviesParsingTest {
         assertNull(request.requestUrl?.queryParameter("vote_average.gte"))
     }
 
+    @Test
+    fun `editorial endpoints send their documented source and classics rule`() = runBlocking {
+        repeat(4) {
+            server.enqueue(
+                MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json")
+                    .setBody("""{"page":1,"results":[],"total_pages":0,"total_results":0}"""),
+            )
+        }
+        val api = createEditorialApi(" ")
+
+        api.trendingMovies()
+        api.nowPlayingMovies()
+        api.topRatedMovies()
+        api.classicMovies()
+
+        val trending = server.takeRequest().requestUrl!!
+        val nowPlaying = server.takeRequest().requestUrl!!
+        val topRated = server.takeRequest().requestUrl!!
+        val classics = server.takeRequest().requestUrl!!
+        assertEquals("/3/trending/movie/week", trending.encodedPath)
+        assertEquals("pt-BR", trending.queryParameter("language"))
+        assertEquals("/3/movie/now_playing", nowPlaying.encodedPath)
+        assertEquals("BR", nowPlaying.queryParameter("region"))
+        assertEquals("/3/movie/top_rated", topRated.encodedPath)
+        assertEquals("BR", topRated.queryParameter("region"))
+        assertEquals("/3/discover/movie", classics.encodedPath)
+        assertEquals("vote_average.desc", classics.queryParameter("sort_by"))
+        assertEquals("7.0", classics.queryParameter("vote_average.gte"))
+        assertEquals("1000", classics.queryParameter("vote_count.gte"))
+        assertEquals("2005-12-31", classics.queryParameter("primary_release_date.lte"))
+        assertEquals("false", classics.queryParameter("include_adult"))
+    }
+
     private fun createApi(accessToken: String): TmdbApi {
         val client =
             OkHttpClient.Builder()
@@ -162,6 +195,16 @@ class DiscoverMoviesParsingTest {
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(TmdbApi::class.java)
+    }
+
+    private fun createEditorialApi(accessToken: String): TmdbEditorialApi {
+        val client = OkHttpClient.Builder().addInterceptor(TmdbAuthInterceptor(accessToken)).build()
+        return Retrofit.Builder()
+            .baseUrl(server.url("/3/"))
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(TmdbEditorialApi::class.java)
     }
 
     private companion object {

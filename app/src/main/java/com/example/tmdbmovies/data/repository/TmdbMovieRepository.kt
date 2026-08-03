@@ -9,8 +9,11 @@ import com.example.tmdbmovies.core.network.toAppError
 import com.example.tmdbmovies.data.remote.DiscoverMoviesPagingSource
 import com.example.tmdbmovies.data.remote.SearchMoviesPagingSource
 import com.example.tmdbmovies.data.remote.TmdbApi
+import com.example.tmdbmovies.data.remote.TmdbEditorialApi
 import com.example.tmdbmovies.data.remote.mapper.toDomain
+import com.example.tmdbmovies.data.remote.mapper.toRemoteMoviePage
 import com.example.tmdbmovies.domain.model.Movie
+import com.example.tmdbmovies.domain.model.MovieCollection
 import com.example.tmdbmovies.domain.model.MovieDetails
 import com.example.tmdbmovies.domain.model.MovieFilters
 import com.example.tmdbmovies.domain.model.Genre
@@ -21,7 +24,24 @@ import kotlinx.coroutines.flow.Flow
 
 internal class TmdbMovieRepository(
     private val api: TmdbApi,
+    private val editorialApi: TmdbEditorialApi? = null,
 ) : MovieRepository {
+    override suspend fun movies(collection: MovieCollection): AppResult<List<Movie>> =
+        try {
+            val source = requireNotNull(editorialApi)
+            val response = when (collection) {
+                MovieCollection.TrendingWeekly -> source.trendingMovies()
+                MovieCollection.NowPlaying -> source.nowPlayingMovies()
+                MovieCollection.TopRated -> source.topRatedMovies()
+                MovieCollection.Classics -> source.classicMovies()
+            }
+            AppResult.Success(response.toRemoteMoviePage().movies)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (exception: Exception) {
+            AppResult.Failure(exception.toAppError())
+        }
+
     override fun pagedMovies(query: String, filters: MovieFilters): Flow<PagingData<Movie>> {
         val normalizedQuery = query.trim()
         val compatibleFilters = filters.compatibleWithQuery(normalizedQuery)

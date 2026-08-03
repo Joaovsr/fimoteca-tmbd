@@ -6,7 +6,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 8 — Discover editorial de filmes é a próxima fase a implementar; a Fase 7 foi concluída com validação automatizada e visual no AVD.
+**Fase atual:** Fase 10 — Detalhes, busca e polimento transversal é a próxima fase a implementar; a Fase 9 foi concluída com validação automatizada e visual no AVD.
 
 **Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, favoritos persistentes com Room, Retrofit/Paging/Coil e navegação por ID.
 
@@ -54,10 +54,18 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - A revisão visual foi decomposta nas Fases 7–10; a Fase 11 é o quality gate de filmes e séries permanecem evolução opcional final na Fase 12.
 - O tema dark-first está aplicado em Compose e Views; a Activity controla a navegação inferior Início/Favoritos/Perfil e a oculta em Busca/Detalhes.
 - A busca existente foi movida para um destino próprio sem alterar seus contratos de Paging; Perfil é um destino local navegável com versão, escopo e atribuição textual do TMDB.
+- A Home usa fontes editoriais independentes para trending semanal, now playing, top rated e clássicos; cada seção possui loading, vazio, erro e retry isolados.
+- Clássicos usa `discover/movie` com `vote_average.desc`, nota mínima 7,0, no mínimo 1.000 votos e lançamento até 2005-12-31; não há filtragem local de páginas.
+- O banner é estático e selecionável entre os cinco primeiros filmes em alta; a seleção é preservada no `SavedStateHandle` e favoritos continuam reativos via Room.
+- Favoritos possui busca local, grid adaptável e cinco ordenações derivadas na UI; “adicionados recentemente” preserva a ordem emitida pelo Room e nenhuma ordenação altera `favoritedAt`.
+- Favoritos usa três colunas fixas; em telas compactas de 432 dp os cards ficam com cerca de 133 dp, equivalentes aos 132 dp da Home, e encolhem proporcionalmente em larguras menores.
+- Busca e ordenação de Favoritos são preservadas em `SavedStateHandle`; o estado vazio retorna à Home e a remoção continua imediata pela fonte local.
+- Perfil observa a quantidade real de favoritos e exibe versão, logo oficial aprovado e aviso obrigatório do TMDB, sem simular conta ou atividade.
+- Ao trocar de aba, a navegação remove destinos filhos restaurados e termina no destino de nível superior selecionado, preservando o estado salvo da aba sem reabrir Detalhes.
 
 ## Próxima ação
 
-Implementar a **Fase 8 — Discover editorial de filmes**: adicionar fontes independentes para trending semanal, now playing, top rated e clássicos via discover; depois substituir a lista provisória da Home por banner e carrosséis com falha isolada por seção.
+Implementar a **Fase 10 — Detalhes, busca e polimento transversal**: alinhar Detalhes XML e Busca à hierarquia final, executar acessibilidade/fallbacks e concluir README, screenshots e instruções.
 
 ## Escolhas provisórias do bootstrap
 
@@ -138,6 +146,18 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: manter a barra inferior na Activity e ocultá-la em Busca/Detalhes; reutilizar a feature paginada existente na Busca; deixar banner e carrosséis exclusivamente para a Fase 8.
 - Pendente: implementar o Discover editorial; adicionar logo oficial do TMDB e resumo real da coleção na Fase 9.
 - Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou; 15 testes instrumentados passaram no Pixel_9/API 37; Home, Busca, Detalhes e Perfil foram inspecionados no AVD.
+
+2026-08-03 — Fase 8 concluída
+- Concluído: fontes editoriais independentes, estado agregado com retry por seção, banner selecionável, carrosséis de pôsteres, favoritos reativos e navegação para Busca/Detalhes.
+- Decidido: clássicos usa corte até 2005-12-31, nota mínima 7,0, mínimo de 1.000 votos e ordenação por nota; o banner não avança automaticamente.
+- Pendente: grid, quantidade e ordenação de Favoritos, resumo real e logo oficial do TMDB no Perfil na Fase 9.
+- Evidência: endpoints e regra editorial cobertos por MockWebServer; ViewModel e UI cobrem sucesso, vazio, erro isolado, retry, seleção e favorito; gate completo e inspeção no Pixel_9/API 37 executados.
+
+2026-08-03 — Fase 9 concluída
+- Concluído: Favoritos em grid adaptável com quantidade, busca, ordenação local e estado vazio acionável; Perfil com contagem real, versão, logo e atribuição do TMDB.
+- Decidido: preservar a ordem do Room para recentes e derivar as demais ordenações no ViewModel; não incluir preferência de aparência sem implementação ponta a ponta.
+- Pendente: polimento visual de Detalhes/Busca, checklist transversal, README e screenshots na Fase 10.
+- Evidência: testes de ViewModel, Compose, Perfil e navegação aprovados; telas vazia de Favoritos e Perfil inspecionadas no Pixel_9/API 37; gate completo executado.
 ```
 
 Use este formato para entradas futuras:

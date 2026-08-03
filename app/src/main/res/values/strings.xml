@@ -44,7 +44,23 @@
     <string name="details_error_not_found">This movie is no longer available.</string>
     <string name="details_error_generic">We could not load movie details. Try again.</string>
     <string name="favorites_title">Favorites</string>
-    <string name="favorites_empty">Your favorite movies will appear here.</string>
+    <string name="favorites_empty">Movies marked with a heart will appear here.</string>
+    <string name="favorites_empty_title">No favorite movies</string>
+    <string name="favorites_explore">Explore movies</string>
+    <plurals name="favorites_count">
+        <item quantity="one">%1$d saved movie</item>
+        <item quantity="other">%1$d saved movies</item>
+    </plurals>
+    <string name="favorites_search_hint">Search your favorites</string>
+    <string name="favorites_no_results_title">No matches</string>
+    <string name="favorites_no_results">Try another title in your collection.</string>
+    <string name="favorites_sort">Sort favorites</string>
+    <string name="favorites_sort_title">Sort favorites</string>
+    <string name="favorites_sort_recent">Recently added</string>
+    <string name="favorites_sort_title_ascending">Title A–Z</string>
+    <string name="favorites_sort_rating">Highest rating</string>
+    <string name="favorites_sort_newest">Newest releases</string>
+    <string name="favorites_sort_oldest">Oldest releases</string>
     <string name="favorites_error">We could not load your favorites.</string>
     <string name="favorite_save">Save favorite</string>
     <string name="favorite_remove">Remove favorite</string>
@@ -54,8 +70,19 @@
     <string name="profile_title">Profile</string>
     <string name="profile_collection_title">Your collection</string>
     <string name="profile_collection_description">Your saved movies are available in Favorites. Personal accounts and viewing activity are not part of this version.</string>
+    <plurals name="profile_collection_count">
+        <item quantity="one">%1$d movie saved locally. Your collection stays on this device.</item>
+        <item quantity="other">%1$d movies saved locally. Your collection stays on this device.</item>
+    </plurals>
     <string name="profile_about_title">About</string>
     <string name="profile_version">TMDB Movies · Version %1$s</string>
     <string name="profile_credits_title">Movie data</string>
     <string name="tmdb_attribution">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
+    <string name="tmdb_logo_description">The Movie Database</string>
+    <string name="discover_badge_trending">TRENDING</string>
+    <string name="discover_trending">Trending this week</string>
+    <string name="discover_now_playing">Now playing</string>
+    <string name="discover_classics">Essential classics</string>
+    <string name="discover_top_rated">Top rated</string>
+    <string name="discover_section_empty">No movies are available in this collection.</string>
 </resources>

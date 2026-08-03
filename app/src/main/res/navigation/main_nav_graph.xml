@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/moviesFragment"
-        android:name="com.example.tmdbmovies.feature.movies.MoviesFragment"
+        android:name="com.example.tmdbmovies.feature.discover.DiscoverFragment"
         android:label="@string/movies_title">
         <action
             android:id="@+id/action_moviesFragment_to_movieDetailsFragment"

@@ -231,6 +231,8 @@ class MoviesViewModelTest {
             return flowOf(PagingData.from(movies))
         }
 
+        override suspend fun movies(collection: com.example.tmdbmovies.domain.model.MovieCollection): AppResult<List<Movie>> = AppResult.Success(emptyList())
+
         override suspend fun genres(): AppResult<List<Genre>> =
             if (genreResults.size > 1) genreResults.removeAt(0) else genreResults.first()
 
@@ -251,6 +253,8 @@ class MoviesViewModelTest {
                 cancelled += query
             }
         }
+
+        override suspend fun movies(collection: com.example.tmdbmovies.domain.model.MovieCollection): AppResult<List<Movie>> = AppResult.Success(emptyList())
 
         override suspend fun genres(): AppResult<List<Genre>> = AppResult.Success(emptyList())
 

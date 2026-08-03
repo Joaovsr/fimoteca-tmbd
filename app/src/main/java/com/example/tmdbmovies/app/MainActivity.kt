@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity() {
                 restoreState = true
             },
         )
+        if (navController.currentDestination?.id != destinationId) {
+            navController.popBackStack(destinationId, false)
+        }
     }
 
     private companion object {

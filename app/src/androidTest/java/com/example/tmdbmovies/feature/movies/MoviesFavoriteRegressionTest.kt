@@ -53,6 +53,8 @@ class MoviesFavoriteRegressionTest {
         override fun pagedMovies(query: String, filters: MovieFilters): Flow<PagingData<Movie>> =
             Pager(PagingConfig(pageSize = 20)) { SingleMoviePagingSource(movie) }.flow
 
+        override suspend fun movies(collection: com.example.tmdbmovies.domain.model.MovieCollection): AppResult<List<Movie>> = AppResult.Success(emptyList())
+
         override suspend fun genres(): AppResult<List<Genre>> = AppResult.Success(emptyList())
 
         override suspend fun movieDetails(movieId: Long): AppResult<MovieDetails> =
