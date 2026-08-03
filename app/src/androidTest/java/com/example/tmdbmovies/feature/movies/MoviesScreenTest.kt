@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.runtime.getValue
@@ -59,7 +61,7 @@ class MoviesScreenTest {
         }
         composeRule.onNodeWithTag("movie-poster-fallback", useUnmergedTree = true).assertExists()
         composeRule.onNodeWithContentDescription("Poster for Movie title").assertExists()
-        composeRule.onNodeWithTag("movie-card-42").performClick()
+        composeRule.onNodeWithTag("movie-card-42").performSemanticsAction(SemanticsActions.OnClick)
 
         assertEquals(42L, selectedId)
     }

@@ -33,7 +33,6 @@ class FavoritesFragment : Fragment() {
                         )
                     },
                     onRemoveClick = viewModel::removeFavorite,
-                    onBackClick = { findNavController().navigateUp() },
                 )
             }
         }

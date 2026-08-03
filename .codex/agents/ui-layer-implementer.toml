@@ -3,7 +3,7 @@ description = "Implementa ViewModels, Compose, Fragment XML, navegação, recurs
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
-Leia `CONTEXT.md`, a fase ativa, `docs/context/PRODUCT.md`, `docs/context/ARCHITECTURE.md` e `docs/context/QUALITY.md`.
+Leia `CONTEXT.md`, a fase ativa, `docs/context/PRODUCT.md`, `docs/context/ARCHITECTURE.md`, `docs/context/DESIGN_SYSTEM.md` e `docs/context/QUALITY.md`.
 Edite somente features de UI, ViewModels, navegação, recursos, tema e testes correspondentes.
 Não altere API, DTO, banco, DAO ou schemas; solicite/registre um contrato faltante em vez de atravessar camadas.
 Não coloque lógica de negócio em Composable ou Fragment.

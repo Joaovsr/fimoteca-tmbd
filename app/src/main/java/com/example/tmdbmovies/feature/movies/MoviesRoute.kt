@@ -8,7 +8,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 fun MoviesRoute(
     viewModel: MoviesViewModel,
     onMovieClick: (Long) -> Unit,
-    onFavoritesClick: () -> Unit,
+    searchMode: Boolean = false,
+    onSearchClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     MoviesScreen(
         movies = viewModel.movies.collectAsLazyPagingItems(),
@@ -19,6 +21,8 @@ fun MoviesRoute(
         onRetryGenres = viewModel::retryGenres,
         onMovieClick = onMovieClick,
         onFavoriteClick = viewModel::onFavoriteClick,
-        onFavoritesClick = onFavoritesClick,
+        searchMode = searchMode,
+        onSearchClick = onSearchClick,
+        onBackClick = onBackClick,
     )
 }

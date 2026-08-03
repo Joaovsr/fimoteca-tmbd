@@ -37,7 +37,7 @@ class MoviesFavoriteRegressionTest {
         val viewModel = MoviesViewModel(FakeMovieRepository(movie), favorites, SavedStateHandle())
         composeRule.setContent {
             TmdbMoviesTheme {
-                MoviesRoute(viewModel, onMovieClick = {}, onFavoritesClick = {})
+                MoviesRoute(viewModel, onMovieClick = {})
             }
         }
 

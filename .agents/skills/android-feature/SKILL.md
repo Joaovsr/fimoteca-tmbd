@@ -8,7 +8,7 @@ description: Orquestra uma feature Android vertical deste projeto. Use ao implem
 ## Fluxo
 
 1. Leia `CONTEXT.md`, a fase em `docs/execution/PLAN.md` e os critérios da feature em `docs/context/PRODUCT.md`.
-2. Consulte `docs/context/ARCHITECTURE.md` e `docs/context/QUALITY.md`; para API TMDB, use também `tmdb-integration`.
+2. Consulte `docs/context/ARCHITECTURE.md` e `docs/context/QUALITY.md`; quando houver UI, leia também `docs/context/DESIGN_SYSTEM.md`; para API TMDB, use também `tmdb-integration`.
 3. Delimite critérios de aceite, contratos necessários, arquivos e validação. Pare se uma dependência anterior não existir ou houver contradição não resolvida.
 4. Implemente uma fatia compilável. Quando separar dados e UI entre agentes, conclua e valide o contrato de dados antes da escrita da UI.
 5. Adicione testes para as regras e transições alteradas.

@@ -17,7 +17,7 @@ class FavoritesScreenTest {
     fun emptyStateIsVisible() {
         composeRule.setContent {
             TmdbMoviesTheme {
-                FavoritesScreen(FavoritesUiState(isLoading = false), {}, {}, {})
+                FavoritesScreen(FavoritesUiState(isLoading = false), {}, {})
             }
         }
 
@@ -36,7 +36,6 @@ class FavoritesScreenTest {
                     FavoritesUiState(listOf(movie), isLoading = false),
                     onMovieClick = { selectedId = it },
                     onRemoveClick = { removedId = it },
-                    onBackClick = {},
                 )
             }
         }

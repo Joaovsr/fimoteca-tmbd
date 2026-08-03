@@ -13,6 +13,24 @@ O token entra pelo ambiente de build local e é fornecido ao interceptor do OkHt
 
 ## Endpoints da primeira versão
 
+### Home editorial de filmes
+
+```http
+GET /3/trending/movie/week
+GET /3/movie/now_playing
+GET /3/movie/top_rated
+GET /3/discover/movie
+```
+
+Uso:
+
+- destaque e `Em alta nesta semana`: trending semanal;
+- `Nos cinemas`: now playing com `language=pt-BR`, `region=BR` e paginação;
+- `Mais bem avaliados`: top rated, ou discover equivalente quando a regra precisar de quantidade mínima de votos;
+- `Clássicos imperdíveis`: discover com data limite, `vote_average.gte`, `vote_count.gte` e ordenação explícita.
+
+`Clássicos imperdíveis` é uma regra editorial do app. Registre os parâmetros escolhidos e cubra-os por teste; a API não possui uma categoria nativa de clássicos.
+
 ### Filmes para descoberta
 
 ```http
@@ -53,6 +71,8 @@ GET /3/movie/{movie_id}
 Parâmetros:
 
 - `language=pt-BR`
+
+Detalhes suporta `append_to_response` para uma evolução explícita, por exemplo `credits,videos`. Não solicitar ou mapear esses blocos antes de elenco/trailer entrarem no plano.
 
 ### Gêneros
 
@@ -169,6 +189,10 @@ Inclua em uma tela/seção de créditos:
 
 O TMDB não deve ser apresentado como patrocinador ou certificador do aplicativo.
 
+## Evolução final: séries
+
+A API suporta `discover/tv`, `search/tv`, `tv/{series_id}`, listas de séries e trending por mídia. Séries exigem modelos e contratos próprios ou uma abstração de mídia deliberada: nomes, datas, temporadas e episódios não devem ser forçados em `Movie`. Essa evolução ocorre somente depois do quality gate da experiência de filmes.
+
 ## Referências oficiais
 
 - TMDB — Getting started: https://developer.themoviedb.org/docs/getting-started
@@ -178,5 +202,12 @@ O TMDB não deve ser apresentado como patrocinador ou certificador do aplicativo
 - TMDB — Movie details: https://developer.themoviedb.org/reference/movie-details
 - TMDB — Movie genres: https://developer.themoviedb.org/reference/genre-movie-list
 - TMDB — Popular movies: https://developer.themoviedb.org/reference/movie-popular-list
+- TMDB — Trending movies: https://developer.themoviedb.org/reference/trending-movies
+- TMDB — Now playing: https://developer.themoviedb.org/reference/movie-now-playing-list
+- TMDB — Top rated movies: https://developer.themoviedb.org/reference/movie-top-rated-list
+- TMDB — Append to response: https://developer.themoviedb.org/docs/append-to-response
+- TMDB — Discover TV: https://developer.themoviedb.org/reference/discover-tv
+- TMDB — Search TV: https://developer.themoviedb.org/reference/search-tv
+- TMDB — TV details: https://developer.themoviedb.org/reference/tv-series-details
 - TMDB — Images: https://developer.themoviedb.org/docs/image-basics
 - TMDB — Attribution: https://developer.themoviedb.org/docs/attribution

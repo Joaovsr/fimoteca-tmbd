@@ -148,26 +148,85 @@ passa e o app abre sem crash.
 - alteração é refletida sem nova chamada remota;
 - operações são idempotentes.
 
-## Fase 7 — Polimento
+## Fase 7 — Fundação visual e navegação
 
 **Responsável sugerido:** `ui-layer-implementer` com revisão do `qa-reviewer`.
 
 **Entregas**
 
-- tema claro/escuro;
-- acessibilidade e tamanhos de fonte;
-- placeholders/fallbacks;
-- mensagens localizadas;
-- créditos e atribuição do TMDB;
+- tokens dark-first de `docs/context/DESIGN_SYSTEM.md` em Compose e Views;
+- componentes compartilhados necessários por duas ou mais telas;
+- barra inferior com Início, Favoritos e Perfil;
+- destinos placeholder navegáveis de Perfil e busca separada, sem prometer funções ausentes;
+- manutenção dos testes de navegação e estados existentes.
+
+**Pronto quando**
+
+- tema e navegação são consistentes entre Compose e XML;
+- nenhum literal visual relevante fica duplicado nas features;
+- os três destinos principais preservam estado e não quebram os fluxos existentes;
+- build, testes e lint passam.
+
+## Fase 8 — Discover editorial de filmes
+
+**Responsáveis sugeridos:** `data-layer-implementer` nos contratos/endpoints e depois `ui-layer-implementer`.
+
+**Entregas**
+
+- fontes para trending semanal, now playing, top rated e clássicos via discover;
+- estado agregado da Home com falha isolada por seção e retry;
+- banner estático selecionável e carrosséis horizontais;
+- favorito reativo e navegação para detalhes;
+- acesso à busca existente em tela própria;
+- testes de endpoint, mapeamento, ViewModel e UI.
+
+**Pronto quando**
+
+- cada seção informa sua fonte/regra e não bloqueia as demais ao falhar;
+- conteúdo, vazio, erro, retry e fallbacks são verificáveis;
+- nenhuma filtragem local de páginas promete representar o catálogo;
+- acessibilidade e fonte ampliada passam nos componentes principais.
+
+## Fase 9 — Favoritos e Perfil
+
+**Responsável sugerido:** `ui-layer-implementer`; dados somente se um campo persistido realmente faltar.
+
+**Entregas**
+
+- favoritos em grid adaptável com quantidade e ordenação local;
+- estado vazio com ação para Início;
+- tela de Perfil local com resumo real da coleção, versão e créditos do TMDB;
+- preferência de aparência somente se implementada de ponta a ponta;
+- testes de ordenação, navegação, remoção e conteúdo do perfil.
+
+**Pronto quando**
+
+- ordenação não altera `favoritedAt` nem depende de rede;
+- Perfil não simula conta, avatar, assistidos ou sincronização;
+- atribuição e logo do TMDB atendem às diretrizes oficiais;
+- grid funciona em retrato, paisagem e fonte ampliada.
+
+## Fase 10 — Detalhes, busca e polimento transversal
+
+**Responsável sugerido:** `ui-layer-implementer` com revisão do `qa-reviewer`.
+
+**Entregas**
+
+- detalhes XML alinhados à hierarquia visual definida, preservando LiveData;
+- busca dedicada reaproveitando paginação, filtros e cancelamento existentes;
+- acessibilidade, placeholders, fallbacks e mensagens localizadas;
 - README final com screenshots e instruções;
 - ícone/nome final, se desejado.
+
+Trailer e elenco são opcionais e exigem uma decisão de escopo antes de adicionar contratos de API.
 
 **Pronto quando**
 
 - checklist manual de `docs/context/QUALITY.md` foi executado;
-- não há overflow ou texto crítico cortado nos cenários testados.
+- não há overflow ou texto crítico cortado nos cenários testados;
+- fluxos existentes continuam cobertos e os gates padrão passam.
 
-## Fase 8 — Quality gate final
+## Fase 11 — Quality gate final de filmes
 
 **Responsável sugerido:** `qa-reviewer` em modo read-only; correções voltam ao agente dono da camada.
 
@@ -192,3 +251,7 @@ passa e o app abre sem crash.
 - nenhuma falha bloqueante permanece;
 - README reproduz o setup;
 - `CONTEXT.md` descreve o estado final sem histórico irrelevante.
+
+## Fase 12 — Séries (evolução opcional final)
+
+Iniciar somente após a Fase 11 e mediante confirmação de escopo. Tratar séries como domínio próprio, com discover, pesquisa, detalhes e favoritos deliberadamente modelados. Não incluir temporadas, episódios, progresso assistido ou autenticação por implicação.

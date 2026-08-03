@@ -42,15 +42,16 @@ fun FavoritesScreen(
     state: FavoritesUiState,
     onMovieClick: (Long) -> Unit,
     onRemoveClick: (Long) -> Unit,
-    onBackClick: () -> Unit,
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.favorites_title)) },
-                navigationIcon = {
-                    TextButton(onClick = onBackClick) { Text(stringResource(R.string.back)) }
+                title = {
+                    Text(
+                        stringResource(R.string.favorites_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
                 },
             )
         },

@@ -30,6 +30,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -78,7 +80,9 @@ fun MoviesScreen(
     onRetryGenres: () -> Unit = {},
     onMovieClick: (Long) -> Unit,
     onFavoriteClick: (MovieUiModel) -> Unit = {},
-    onFavoritesClick: () -> Unit = {},
+    searchMode: Boolean = true,
+    onSearchClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     val requestKey = uiState.requestKey()
@@ -94,12 +98,34 @@ fun MoviesScreen(
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.movies_title)) },
+                title = {
+                    Text(
+                        stringResource(if (searchMode) R.string.search_title else R.string.app_name),
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                },
+                navigationIcon = {
+                    if (searchMode) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                painterResource(R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(R.string.back),
+                            )
+                        }
+                    }
+                },
                 actions = {
-                    TextButton(
-                        onClick = onFavoritesClick,
-                        modifier = Modifier.semantics { testTag = "open-favorites" },
-                    ) { Text(stringResource(R.string.favorites_title)) }
+                    if (!searchMode) {
+                        IconButton(
+                            onClick = onSearchClick,
+                            modifier = Modifier.semantics { testTag = "open-search" },
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_search),
+                                contentDescription = stringResource(R.string.search_title),
+                            )
+                        }
+                    }
                 },
             )
         },
@@ -107,6 +133,7 @@ fun MoviesScreen(
         Column(Modifier.fillMaxSize().padding(padding)) {
             MoviesControls(
                 uiState = uiState,
+                showSearchField = searchMode,
                 onQueryChanged = onQueryChanged,
                 onFiltersChanged = onFiltersChanged,
                 onClearFilters = onClearFilters,
@@ -131,6 +158,7 @@ fun MoviesScreen(
 @Composable
 private fun MoviesControls(
     uiState: MoviesUiState,
+    showSearchField: Boolean = true,
     onQueryChanged: (String) -> Unit,
     onFiltersChanged: (MovieFilters) -> Unit,
     onClearFilters: () -> Unit,
@@ -144,22 +172,24 @@ private fun MoviesControls(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        OutlinedTextField(
-            value = uiState.query,
-            onValueChange = onQueryChanged,
-            singleLine = true,
-            label = { Text(stringResource(R.string.movies_search_label)) },
-            placeholder = { Text(stringResource(R.string.movies_search_hint)) },
-            trailingIcon = {
-                if (uiState.query.isNotEmpty()) {
-                    TextButton(
-                        onClick = { onQueryChanged("") },
-                        modifier = Modifier.semantics { testTag = "search-clear" },
-                    ) { Text(stringResource(R.string.clear)) }
-                }
-            },
-            modifier = Modifier.fillMaxWidth().semantics { testTag = "movies-search" },
-        )
+        if (showSearchField) {
+            OutlinedTextField(
+                value = uiState.query,
+                onValueChange = onQueryChanged,
+                singleLine = true,
+                label = { Text(stringResource(R.string.movies_search_label)) },
+                placeholder = { Text(stringResource(R.string.movies_search_hint)) },
+                trailingIcon = {
+                    if (uiState.query.isNotEmpty()) {
+                        TextButton(
+                            onClick = { onQueryChanged("") },
+                            modifier = Modifier.semantics { testTag = "search-clear" },
+                        ) { Text(stringResource(R.string.clear)) }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().semantics { testTag = "movies-search" },
+            )
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedButton(
                 onClick = { showFilters = true },

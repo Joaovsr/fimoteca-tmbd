@@ -1,12 +1,12 @@
 # Contexto atual do projeto
 
-Atualizado em: **2026-07-31**
+Atualizado em: **2026-08-03**
 
 Este arquivo é mutável. Ele registra o estado presente e não repete regras permanentes de `AGENTS.md` nem especificações completas de `docs/context/`.
 
 ## Estado
 
-**Fase atual:** Fase 7 — Polimento é a próxima fase a implementar; a Fase 6 foi concluída com testes unitários e instrumentados no AVD.
+**Fase atual:** Fase 8 — Discover editorial de filmes é a próxima fase a implementar; a Fase 7 foi concluída com validação automatizada e visual no AVD.
 
 **Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, favoritos persistentes com Room, Retrofit/Paging/Coil e navegação por ID.
 
@@ -49,10 +49,15 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - OkHttp permanece em `4.12.0`, a versão resolvida pelo Retrofit `3.0.0`; não há logging HTTP nesta fase.
 - No Android Studio, o Gradle JDK deve usar o Embedded JDK em `/Applications/Android Studio.app/Contents/jbr/Contents/Home`; a referência local `jbr-25` estava indefinida.
 - Subagentes reportam progresso; somente o agente principal consolida este arquivo.
+- A direção visual dark-first, os tokens, a navegação Início/Favoritos/Perfil e os componentes estão em `docs/context/DESIGN_SYSTEM.md`.
+- Perfil é local e contém somente dados/preferências reais e créditos; autenticação e sincronização TMDB continuam fora do escopo.
+- A revisão visual foi decomposta nas Fases 7–10; a Fase 11 é o quality gate de filmes e séries permanecem evolução opcional final na Fase 12.
+- O tema dark-first está aplicado em Compose e Views; a Activity controla a navegação inferior Início/Favoritos/Perfil e a oculta em Busca/Detalhes.
+- A busca existente foi movida para um destino próprio sem alterar seus contratos de Paging; Perfil é um destino local navegável com versão, escopo e atribuição textual do TMDB.
 
 ## Próxima ação
 
-Implementar a **Fase 7 — Polimento**: revisar tema claro/escuro, acessibilidade e fonte ampliada, fallbacks e mensagens, créditos do TMDB, README final, screenshots e checklist manual completo.
+Implementar a **Fase 8 — Discover editorial de filmes**: adicionar fontes independentes para trending semanal, now playing, top rated e clássicos via discover; depois substituir a lista provisória da Home por banner e carrosséis com falha isolada por seção.
 
 ## Escolhas provisórias do bootstrap
 
@@ -121,6 +126,18 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: aplicar `cachedIn(viewModelScope)` ao fluxo paginado antes do `combine` com favoritos, preservando uma geração coletável novamente a cada emissão do Room.
 - Pendente: nenhum risco adicional desta correção; permanece o checklist manual da Fase 7.
 - Evidência: o teste reproduziu `Attempt to collect twice from pageEventFlow` antes da correção e passou depois; gates padrão passaram com 42 testes unitários, lint sem erros e 13 instrumentados no Pixel_9/API 37; Logcat final sem `AndroidRuntime`.
+
+2026-08-03 — Direção visual e plano revisados
+- Concluído: especificação visual criada; produto, API, qualidade, plano e perfil de UI alinhados à nova Home de filmes, favoritos em grid e Perfil local.
+- Decidido: documentação de design é contexto do produto, não uma skill nem biblioteca própria; séries ficam após o quality gate de filmes; Perfil não implica conta TMDB.
+- Pendente: implementar a Fase 7 e validar a fundação visual antes dos novos endpoints da Home.
+- Evidência: contratos confrontados com a documentação oficial de trending, now playing, top rated, discover/search/details de TV, autenticação de usuário e append to response do TMDB.
+
+2026-08-03 — Fase 7 concluída
+- Concluído: tokens dark-first aplicados em Compose/Views, navegação inferior Início/Favoritos/Perfil, ícones com contorno/preenchimento por estado, Perfil local e Busca em destino próprio.
+- Decidido: manter a barra inferior na Activity e ocultá-la em Busca/Detalhes; reutilizar a feature paginada existente na Busca; deixar banner e carrosséis exclusivamente para a Fase 8.
+- Pendente: implementar o Discover editorial; adicionar logo oficial do TMDB e resumo real da coleção na Fase 9.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou; 15 testes instrumentados passaram no Pixel_9/API 37; Home, Busca, Detalhes e Perfil foram inspecionados no AVD.
 ```
 
 Use este formato para entradas futuras:
