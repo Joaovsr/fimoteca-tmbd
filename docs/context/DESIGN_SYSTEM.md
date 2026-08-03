@@ -120,7 +120,7 @@ Não incluir `Continue assistindo`, `Assistidos`, watchlist ou estatísticas que
 
 ### Detalhes e busca
 
-A linguagem visual definida aqui também se aplica às telas existentes de detalhes e busca. A revisão de detalhes deve usar backdrop com gradiente, pôster, título, metadados, nota, favorito e sinopse. Trailer e elenco só entram quando endpoints e contratos correspondentes fizerem parte de uma fase explícita.
+A linguagem visual definida aqui também se aplica às telas existentes de detalhes e busca. A revisão de detalhes deve usar somente o backdrop com gradiente como imagem principal, seguido por título, metadados, nota, favorito e sinopse. O pôster permanece nos cards de listas e favoritos, mas não é exibido em Detalhes. Trailer e elenco só entram quando endpoints e contratos correspondentes fizerem parte de uma fase explícita.
 
 ## Componentes reutilizáveis
 

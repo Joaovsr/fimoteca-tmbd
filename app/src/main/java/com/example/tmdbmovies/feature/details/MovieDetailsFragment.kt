@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import coil3.load
 import coil3.request.error
 import coil3.request.fallback
 import coil3.request.placeholder
 import com.example.tmdbmovies.R
-import com.example.tmdbmovies.core.ui.tmdbPosterUrl
+import com.example.tmdbmovies.core.ui.tmdbBackdropUrl
 import com.example.tmdbmovies.databinding.FragmentMovieDetailsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,6 +31,7 @@ class MovieDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = requireNotNull(binding)
+        binding.detailsToolbar.setNavigationOnClickListener { findNavController().navigateUp() }
         binding.retryButton.setOnClickListener { viewModel.retry() }
         binding.favoriteButton.setOnClickListener { viewModel.onFavoriteClick() }
         viewModel.state.observe(viewLifecycleOwner, ::render)
@@ -61,14 +63,20 @@ class MovieDetailsFragment : Fragment() {
         val title = movie.title ?: getString(R.string.movie_title_unavailable)
         binding.movieTitle.text = title
         binding.movieOverview.text = movie.overview ?: getString(R.string.movie_overview_unavailable)
-        binding.movieReleaseDate.text = movie.releaseDate ?: getString(R.string.movie_date_unavailable)
+        binding.movieReleaseDate.text = movie.releaseDate?.let {
+            getString(R.string.details_release_date, it)
+        } ?: getString(R.string.movie_date_unavailable)
+        binding.movieRating.isVisible = movie.voteAverage != null
+        binding.movieRating.text = movie.voteAverage?.let { getString(R.string.details_rating, it) }
         binding.favoriteButton.setText(if (isFavorite) R.string.favorite_remove else R.string.favorite_save)
+        binding.favoriteButton.setIconResource(
+            if (isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_outline,
+        )
         binding.favoriteButton.contentDescription = getString(
             if (isFavorite) R.string.favorite_remove_description else R.string.favorite_save_description,
             title,
         )
-        binding.moviePoster.contentDescription = getString(R.string.movie_poster_content_description, title)
-        binding.moviePoster.load(tmdbPosterUrl(movie.posterPath)) {
+        binding.movieBackdrop.load(tmdbBackdropUrl(movie.backdropPath)) {
             placeholder(R.drawable.ic_movie_fallback)
             error(R.drawable.ic_movie_fallback)
             fallback(R.drawable.ic_movie_fallback)

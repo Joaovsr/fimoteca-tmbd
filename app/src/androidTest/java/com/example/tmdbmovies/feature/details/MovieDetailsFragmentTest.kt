@@ -49,6 +49,7 @@ class MovieDetailsFragmentTest {
                 onView(withText("Clube da Luta")).check(matches(isDisplayed()))
                 onView(withText(R.string.movie_overview_unavailable)).check(matches(isDisplayed()))
                 onView(withText(R.string.movie_date_unavailable)).check(matches(isDisplayed()))
+                onView(withText("★ 8.4")).check(matches(isDisplayed()))
 
                 scenario.recreate()
                 onView(withText("Clube da Luta")).check(matches(isDisplayed()))
@@ -74,7 +75,7 @@ class MovieDetailsFragmentTest {
             return if (requests.size == 1) {
                 AppResult.Failure(AppError.NoConnection)
             } else {
-                AppResult.Success(MovieDetails(movieId, "Clube da Luta", null, null, null, null))
+                AppResult.Success(MovieDetails(movieId, "Clube da Luta", null, null, null, null, 8.4))
             }
         }
     }

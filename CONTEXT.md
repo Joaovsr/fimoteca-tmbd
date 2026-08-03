@@ -6,7 +6,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 10 — Detalhes, busca e polimento transversal é a próxima fase a implementar; a Fase 9 foi concluída com validação automatizada e visual no AVD.
+**Fase atual:** Fase 11 — Quality gate final de filmes é a próxima fase; a Fase 10 foi concluída com validação automatizada, checklist manual no AVD, README e screenshots finais.
 
 **Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, favoritos persistentes com Room, Retrofit/Paging/Coil e navegação por ID.
 
@@ -62,10 +62,13 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Busca e ordenação de Favoritos são preservadas em `SavedStateHandle`; o estado vazio retorna à Home e a remoção continua imediata pela fonte local.
 - Perfil observa a quantidade real de favoritos e exibe versão, logo oficial aprovado e aviso obrigatório do TMDB, sem simular conta ou atividade.
 - Ao trocar de aba, a navegação remove destinos filhos restaurados e termina no destino de nível superior selecionado, preservando o estado salvo da aba sem reabrir Detalhes.
+- Detalhes preserva Fragment XML, View Binding e LiveData e usa somente o backdrop com gradiente como imagem principal, seguido por metadados, nota real, favorito e sinopse; o pôster permanece disponível para listas/favoritos e `vote_average` continua nullável em todas as fronteiras.
+- Busca preserva Paging, filtros e cancelamento, com cards e estados alinhados aos tokens finais; botões tonais usam a superfície secundária em Compose e Views.
+- Screenshots finais com dados reais ficam em `docs/screenshots/` e o README documenta escopo, setup, execução, testes, arquitetura e limites.
 
 ## Próxima ação
 
-Implementar a **Fase 10 — Detalhes, busca e polimento transversal**: alinhar Detalhes XML e Busca à hierarquia final, executar acessibilidade/fallbacks e concluir README, screenshots e instruções.
+Executar a **Fase 11 — Quality gate final de filmes** em modo de revisão: dependências e fronteiras, segredo/logging, gates limpos, critérios de aceite e limitações reais.
 
 ## Escolhas provisórias do bootstrap
 
@@ -158,6 +161,18 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: preservar a ordem do Room para recentes e derivar as demais ordenações no ViewModel; não incluir preferência de aparência sem implementação ponta a ponta.
 - Pendente: polimento visual de Detalhes/Busca, checklist transversal, README e screenshots na Fase 10.
 - Evidência: testes de ViewModel, Compose, Perfil e navegação aprovados; telas vazia de Favoritos e Perfil inspecionadas no Pixel_9/API 37; gate completo executado.
+
+2026-08-03 — Fase 10 concluída
+- Concluído: Detalhes XML com hierarquia cinematográfica e nota real; Busca polida sem alterar Paging/filtros; fallbacks, mensagens e semântica revisados; README e quatro screenshots reais finalizados.
+- Decidido: mapear somente `vote_average` do contrato de detalhes já existente, sem `append_to_response`; manter backdrop decorativo e pôster informativo; usar superfície secundária para ações tonais nos dois toolkits.
+- Pendente: executar a revisão read-only da Fase 11; o cenário de token ausente ficou coberto por contrato/código, mas não foi recompilado manualmente sem o token local nesta fase.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou, com 20 instrumentados no Pixel_9/API 37; AVD confirmou rede real/lenta, offline/retry, fonte 200%, paisagem rolável, descrições acessíveis e favorito persistente após encerramento do processo; quality gate da fase sem achado bloqueante.
+
+2026-08-03 — Detalhes simplificado para banner único
+- Concluído: removida a capa/pôster da tela de Detalhes; backdrop, gradiente, retorno, título, metadados, favorito e sinopse foram preservados.
+- Decidido: o pôster continua no domínio e nas demais telas, mas Detalhes usa somente o banner para evitar repetição visual.
+- Pendente: nenhum escopo adicional; permanece a Fase 11 como próxima ação.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 20 instrumentados; inspeção no Pixel_9/API 37 confirmou somente o banner na árvore visual/acessível, sem espaço reservado para o pôster.
 ```
 
 Use este formato para entradas futuras:

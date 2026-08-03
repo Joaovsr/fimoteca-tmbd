@@ -8,5 +8,6 @@
     <color name="text_secondary">#A7AEAA</color>
     <color name="divider">#2A2E2F</color>
     <color name="rating_yellow">#FFC94A</color>
+    <color name="hero_scrim_mid">#990B0D0E</color>
     <color name="launcher_background">#0B0D0E</color>
 </resources>

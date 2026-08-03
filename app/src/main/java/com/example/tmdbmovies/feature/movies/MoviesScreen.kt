@@ -1,6 +1,7 @@
 package com.example.tmdbmovies.feature.movies
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -101,7 +103,7 @@ fun MoviesScreen(
                 title = {
                     Text(
                         stringResource(if (searchMode) R.string.search_title else R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineLarge,
                     )
                 },
                 navigationIcon = {
@@ -139,7 +141,6 @@ fun MoviesScreen(
                 onClearFilters = onClearFilters,
                 onRetryGenres = onRetryGenres,
             )
-            HorizontalDivider()
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 when (val refresh = movies.loadState.refresh) {
                     is LoadState.Loading if movies.itemCount == 0 -> LoadingContent()
@@ -179,22 +180,38 @@ private fun MoviesControls(
                 singleLine = true,
                 label = { Text(stringResource(R.string.movies_search_label)) },
                 placeholder = { Text(stringResource(R.string.movies_search_hint)) },
+                leadingIcon = {
+                    Icon(
+                        painterResource(R.drawable.ic_search),
+                        contentDescription = null,
+                    )
+                },
                 trailingIcon = {
                     if (uiState.query.isNotEmpty()) {
-                        TextButton(
+                        IconButton(
                             onClick = { onQueryChanged("") },
                             modifier = Modifier.semantics { testTag = "search-clear" },
-                        ) { Text(stringResource(R.string.clear)) }
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_close),
+                                contentDescription = stringResource(R.string.clear_search),
+                            )
+                        }
                     }
                 },
+                shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.fillMaxWidth().semantics { testTag = "movies-search" },
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedButton(
+            FilledTonalButton(
                 onClick = { showFilters = true },
                 modifier = Modifier.semantics { testTag = "filters-open" },
-            ) { Text(stringResource(R.string.filters)) }
+            ) {
+                Icon(painterResource(R.drawable.ic_sort), contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.filters))
+            }
             if (hasVisibleFilters) {
                 TextButton(onClick = onClearFilters) { Text(stringResource(R.string.filters_clear_all)) }
             }
@@ -461,12 +478,17 @@ private fun MoviesListContent(
 @Composable
 private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit, onFavoriteClick: () -> Unit) {
     val title = movie.title.ifBlank { stringResource(R.string.movie_title_unavailable) }
+    val favoriteDescription = stringResource(
+        if (movie.isFavorite) R.string.favorite_remove_description else R.string.favorite_save_description,
+        title,
+    )
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().semantics { testTag = "movie-card-${movie.id}" },
-        colors = CardDefaults.cardColors(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = tmdbPosterUrl(movie.posterPath),
                 contentDescription = stringResource(R.string.movie_poster_content_description, title),
@@ -474,19 +496,45 @@ private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit, onFavoriteClick:
                 error = painterResource(R.drawable.ic_movie_fallback),
                 fallback = painterResource(R.drawable.ic_movie_fallback),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(width = 92.dp, height = 138.dp).then(
+                modifier = Modifier
+                    .size(width = 112.dp, height = 168.dp)
+                    .clip(RoundedCornerShape(topStart = 14.dp, bottomStart = 14.dp))
+                    .then(
                     if (movie.posterPath.isNullOrBlank()) Modifier.semantics { testTag = "movie-poster-fallback" }
                     else Modifier,
                 ),
             )
-            Spacer(Modifier.size(16.dp))
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(movie.releaseDate ?: stringResource(R.string.movie_date_unavailable), style = MaterialTheme.typography.bodyMedium)
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(title, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    movie.releaseDate ?: stringResource(R.string.movie_date_unavailable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                movie.voteAverage?.let { rating ->
+                    Text(
+                        stringResource(R.string.details_rating, rating),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.tertiary,
+                    )
+                }
                 TextButton(
                     onClick = onFavoriteClick,
-                    modifier = Modifier.semantics { testTag = "movie-favorite-${movie.id}" },
+                    modifier = Modifier.semantics {
+                        testTag = "movie-favorite-${movie.id}"
+                        contentDescription = favoriteDescription
+                    },
                 ) {
+                    Icon(
+                        painterResource(
+                            if (movie.isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_outline,
+                        ),
+                        contentDescription = null,
+                    )
+                    Spacer(Modifier.size(8.dp))
                     Text(stringResource(if (movie.isFavorite) R.string.favorite_remove else R.string.favorite_save))
                 }
             }
@@ -504,7 +552,23 @@ private fun LoadingContent(modifier: Modifier = Modifier) = Box(
 internal fun EmptyContent(isSearching: Boolean = false, modifier: Modifier = Modifier) = Box(
     modifier = modifier.fillMaxSize().semantics { testTag = "movies-empty" },
     contentAlignment = Alignment.Center,
-) { Text(stringResource(if (isSearching) R.string.movies_search_empty else R.string.movies_empty)) }
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(24.dp),
+    ) {
+        Text(
+            stringResource(if (isSearching) R.string.movies_search_empty_title else R.string.movies_empty_title),
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        Text(
+            stringResource(if (isSearching) R.string.movies_search_empty else R.string.movies_empty),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 @Composable
 internal fun MoviesErrorContent(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) = Box(
@@ -512,8 +576,10 @@ internal fun MoviesErrorContent(message: String, onRetry: () -> Unit, modifier: 
     contentAlignment = Alignment.Center,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
-        Text(message)
-        Spacer(Modifier.height(16.dp))
+        Text(stringResource(R.string.movies_error_title), style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(8.dp))
+        Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(20.dp))
         Button(onClick = onRetry, modifier = Modifier.semantics { testTag = "movies-retry" }) {
             Text(stringResource(R.string.retry))
         }

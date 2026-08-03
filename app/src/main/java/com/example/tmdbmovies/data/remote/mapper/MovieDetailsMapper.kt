@@ -13,6 +13,7 @@ internal fun MovieDetailsDto.toDomain(): MovieDetails? {
         posterPath = posterPath.normalizedPath(),
         backdropPath = backdropPath.normalizedPath(),
         releaseDate = releaseDate.normalizedDate(),
+        voteAverage = voteAverage?.takeIf { it.isFinite() && it > 0.0 },
     )
 }
 

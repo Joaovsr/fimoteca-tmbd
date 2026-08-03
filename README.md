@@ -1,96 +1,70 @@
-# TMDB Movies — Android Challenge
+# TMDB Movies
 
-Aplicativo Android para listar, pesquisar, filtrar, detalhar e favoritar filmes usando a API do The Movie Database (TMDB).
+Aplicativo Android nativo para descobrir, pesquisar, filtrar, detalhar e favoritar filmes usando a API do [The Movie Database (TMDB)](https://www.themoviedb.org/).
 
-Este repositório foi preparado para desenvolvimento assistido por agentes de IA. As regras permanentes ficam em `AGENTS.md`; o estado atual do trabalho fica em `CONTEXT.md`; decisões detalhadas ficam em `docs/context/`; e instruções especializadas ficam em `.agents/skills/`.
+## Experiência
 
-## Escopo funcional
+- Home editorial com destaque, filmes em alta, em cartaz, clássicos e mais bem avaliados.
+- Busca paginada por título, com debounce, cancelamento e filtros compatíveis com o endpoint ativo.
+- Detalhes em Fragment XML com banner/backdrop, data, nota, favorito e sinopse.
+- Favoritos locais persistidos com Room, busca e cinco ordenações sem depender de rede.
+- Perfil local com resumo real da coleção, versão e atribuição do TMDB.
+- Estados explícitos de loading, vazio, erro, conteúdo e retry.
 
-- Lista paginada de filmes.
-- Pesquisa por título.
-- Filtros de descoberta por gênero, ordenação e nota mínima.
-- Tela de detalhes com título, sinopse, data de lançamento e imagem.
-- Favoritos persistidos localmente com Room.
-- Estados explícitos de carregamento, vazio, erro e sucesso.
-- Repetição de requisições com ação de tentar novamente.
+## Screenshots
 
-## Decisões principais
+| Home | Busca | Detalhes | Favoritos |
+|---|---|---|---|
+| ![Home com filme em destaque e carrosséis](docs/screenshots/home.png) | ![Busca com filtros e resultados](docs/screenshots/search.png) | ![Detalhes de um filme](docs/screenshots/details.png) | ![Coleção local de favoritos](docs/screenshots/favorites.png) |
 
-- **Módulo único:** suficiente para o tamanho do desafio e mais fácil de avaliar.
-- **Arquitetura em camadas:** a UI chama contratos de domínio implementados por dados; no código, UI e dados dependem do domínio.
-- **UI híbrida intencional:**
-  - lista, pesquisa, filtros e favoritos em Jetpack Compose;
-  - detalhes em `Fragment` com layout XML;
-  - navegação hospedada por uma única `Activity`.
-- **Estado:** `StateFlow` nas telas Compose; `LiveData` na tela XML de detalhes.
-- **Paginação:** `PagingSource` consumindo Retrofit. `RemoteMediator` não faz parte da primeira versão.
-- **Room:** fonte de verdade apenas para favoritos na primeira versão.
-- **DI:** Koin com módulos separados para rede, banco, repositórios e features.
+As imagens foram capturadas no emulador com dados reais retornados pelo TMDB em 3 de agosto de 2026.
 
-A justificativa completa está em [`docs/context/ARCHITECTURE.md`](docs/context/ARCHITECTURE.md).
+## Stack e arquitetura
+
+- Kotlin, Coroutines, Flow, StateFlow e LiveData.
+- Jetpack Compose nas telas de Home, Busca, Favoritos e Perfil.
+- Fragment + XML + View Binding em Detalhes.
+- Navigation Component com uma única Activity.
+- Retrofit, Kotlin serialization e OkHttp para rede.
+- Paging 3 com `PagingSource` remoto, sem `RemoteMediator`.
+- Room como fonte de verdade dos favoritos.
+- Koin para injeção de dependências e Coil para imagens.
+
+O projeto usa um único módulo `app` e mantém a direção `UI → domínio ← dados`. DTOs, entidades Room, modelos de domínio e modelos de UI são convertidos nas fronteiras; `PagingData` é a única dependência AndroidX permitida no contrato paginado do domínio. As decisões completas estão em [ARCHITECTURE.md](docs/context/ARCHITECTURE.md).
 
 ## Pré-requisitos
 
-Baseline pesquisada em **30 de julho de 2026**:
-
-- Android Studio Quail 2 | 2026.1.2 ou compatível.
+- Android Studio com suporte a AGP 9.3 ou execução equivalente por linha de comando.
 - JDK 17.
-- Android Gradle Plugin 9.3.0.
-- Gradle 9.5.0.
-- `compileSdk` e `targetSdk` 36.
-- `minSdk` 23.
+- Android SDK 36.
+- Um API Read Access Token do TMDB.
 
-As versões das bibliotecas estão em [`docs/context/TECH_BASELINE.md`](docs/context/TECH_BASELINE.md). O agente responsável pelo bootstrap deve validá-las em conjunto antes de iniciar a implementação.
+A baseline completa e datada está em [TECH_BASELINE.md](docs/context/TECH_BASELINE.md).
 
-## Configuração da API
+## Configuração
 
-1. Crie uma conta no TMDB e gere um **API Read Access Token**.
-2. Copie `local.properties.example` para `local.properties` e substitua os caminhos/valores locais:
+1. Clone o repositório.
+2. Copie `local.properties.example` para `local.properties`.
+3. Configure o SDK e o token local:
 
 ```properties
 sdk.dir=/caminho/absoluto/para/Android/sdk
-TMDB_ACCESS_TOKEN=seu_token_aqui
+TMDB_ACCESS_TOKEN=seu_api_read_access_token
 ```
 
-3. O Gradle deve expor o valor apenas ao build local, por exemplo por `BuildConfig`, e um interceptor do OkHttp deve enviar:
+4. No Android Studio, selecione JDK 17 (o Embedded JDK é a opção recomendada).
+5. Sincronize o Gradle e execute a configuração `app`, ou use:
 
-```http
-Authorization: Bearer <token>
+```bash
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Nunca grave o token em código-fonte, recursos, commits, logs ou arquivos de exemplo versionados.
+O token entra somente no build local e é enviado pelo interceptor como `Authorization: Bearer …`. Ele não deve ser salvo em código, recursos, logs, fixtures ou commits. Token ausente ou inválido é convertido em uma orientação segura na interface, sem exibir credenciais nem detalhes internos.
 
-## Como os agentes devem trabalhar
+## Verificação
 
-Leia nesta ordem:
-
-1. `AGENTS.md`
-2. `CONTEXT.md`
-3. `docs/context/PRODUCT.md`
-4. `docs/context/ARCHITECTURE.md`
-5. o documento específico da tarefa
-6. o `SKILL.md` aplicável
-
-O fluxo recomendado é:
-
-1. o agente principal escolhe uma fase em `docs/execution/PLAN.md`;
-2. o arquiteto produz um plano restrito ao escopo;
-3. apenas um agente de escrita atua em cada conjunto de arquivos compartilhados;
-4. o revisor executa a quality gate;
-5. o agente principal atualiza `CONTEXT.md` com decisões e pendências reais.
-
-### Exemplos de delegação
-
-- **Planejamento:** `android-architect`
-- **Retrofit, Paging, Room e repositórios:** `data-layer-implementer`
-- **Compose, XML, navegação e ViewModels:** `ui-layer-implementer`
-- **Revisão final:** `qa-reviewer`
-
-Os arquivos dos subagentes estão em `.codex/agents/`. O modelo padrão pode ser trocado em `.codex/config.toml` caso não esteja disponível no ambiente utilizado.
-
-## Comandos de verificação
-
-Depois que o projeto Gradle existir:
+Gates padrão:
 
 ```bash
 ./gradlew assembleDebug
@@ -98,58 +72,47 @@ Depois que o projeto Gradle existir:
 ./gradlew lintDebug
 ```
 
-Quando houver dispositivo ou emulador configurado:
+Com um emulador ou dispositivo disponível:
 
 ```bash
 ./gradlew connectedDebugAndroidTest
 ```
 
-Uma fase só é considerada concluída após os testes relevantes, lint sem erros bloqueantes, ausência de segredo versionado e atualização do contexto.
+Os testes cobrem parsing e mapeamento, política de endpoints/filtros, paginação, repositories, ViewModels, persistência Room e os estados críticos das telas Compose/XML.
 
-## Estrutura planejada
+## Estrutura principal
 
 ```text
-app/src/main/java/<application_id>/
-├── core/
-│   ├── common/
-│   ├── database/
-│   ├── network/
-│   └── ui/
-├── data/
-│   ├── local/
-│   ├── remote/
-│   └── repository/
-├── domain/
-│   ├── model/
-│   └── repository/
+app/src/main/java/com/example/tmdbmovies/
+├── app/                 # Application e Activity
+├── core/               # erro, rede, banco, imagens e tema
+├── data/               # Retrofit, DTOs, Room e repositories
+├── domain/             # modelos e contratos independentes
 ├── feature/
-│   ├── details/
-│   ├── favorites/
-│   └── movies/
-└── di/
+│   ├── details/        # Fragment XML + LiveData
+│   ├── discover/       # Home editorial
+│   ├── favorites/      # coleção local
+│   ├── movies/         # busca, filtros e Paging
+│   └── profile/        # perfil local e créditos
+└── di/                 # módulos Koin
 ```
 
-Use cases só devem ser criados quando encapsularem uma regra, coordenarem mais de um repositório ou forem reutilizados. Não crie uma classe por operação apenas para aumentar o número de camadas.
+## Limites desta versão
 
-## Atribuição do TMDB
+Não há login ou sincronização com conta TMDB, séries, trailers, elenco, histórico assistido, analytics ou cache geral do catálogo. Favoritos são locais e imagens dependem de rede. Esses limites evitam sugerir funcionalidades que o aplicativo ainda não persiste ou oferece.
 
-O aplicativo deve incluir uma tela ou seção de créditos com o logotipo oficial do TMDB e o aviso exigido:
+## Atribuição
 
-> This product uses the TMDB API but is not endorsed or certified by TMDB.
+This product uses the TMDB API but is not endorsed or certified by TMDB.
 
-Consulte [`docs/context/TMDB_API.md`](docs/context/TMDB_API.md) antes de implementar recursos ou textos relacionados à API.
+O aplicativo também exibe o logotipo e esse aviso na tela Perfil, conforme as diretrizes do TMDB.
 
-## Documentação do projeto
+## Documentação
 
-- [`AGENTS.md`](AGENTS.md): regras curtas e permanentes para qualquer agente.
-- [`CONTEXT.md`](CONTEXT.md): estado atual, decisões já tomadas e próximos passos.
-- [`docs/context/PRODUCT.md`](docs/context/PRODUCT.md): requisitos e critérios de aceite.
-- [`docs/context/ARCHITECTURE.md`](docs/context/ARCHITECTURE.md): arquitetura e limites das camadas.
-- [`docs/context/TMDB_API.md`](docs/context/TMDB_API.md): contrato externo, autenticação e política de filtros.
-- [`docs/context/QUALITY.md`](docs/context/QUALITY.md): testes, lint, acessibilidade e definição de pronto.
-- [`docs/context/TECH_BASELINE.md`](docs/context/TECH_BASELINE.md): baseline tecnológica datada.
-- [`docs/execution/PLAN.md`](docs/execution/PLAN.md): sequência implementável por fases.
-
-## Fontes técnicas
-
-As referências oficiais consultadas estão listadas no final de cada documento de contexto. Ao atualizar uma decisão dependente de versão, registre a data e a fonte primária utilizada.
+- [AGENTS.md](AGENTS.md): regras permanentes para agentes.
+- [CONTEXT.md](CONTEXT.md): estado atual e histórico curto de decisões.
+- [PRODUCT.md](docs/context/PRODUCT.md): requisitos e critérios de aceite.
+- [DESIGN_SYSTEM.md](docs/context/DESIGN_SYSTEM.md): direção visual e acessibilidade.
+- [TMDB_API.md](docs/context/TMDB_API.md): endpoints, autenticação e política de filtros.
+- [QUALITY.md](docs/context/QUALITY.md): estratégia e checklist de qualidade.
+- [PLAN.md](docs/execution/PLAN.md): fases incrementais de execução.
