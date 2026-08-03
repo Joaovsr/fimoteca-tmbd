@@ -175,7 +175,7 @@ passa e o app abre sem crash.
 
 - fontes para trending semanal, now playing, top rated e clássicos via discover;
 - estado agregado da Home com falha isolada por seção e retry;
-- banner estático selecionável e carrosséis horizontais;
+- banner selecionável com swipe e avanço automático, além de carrosséis horizontais;
 - favorito reativo e navegação para detalhes;
 - acesso à busca existente em tela própria;
 - testes de endpoint, mapeamento, ViewModel e UI.

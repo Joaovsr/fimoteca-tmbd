@@ -42,11 +42,11 @@ class MoviesFavoriteRegressionTest {
         }
 
         composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Remove favorite").fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithText("Remover dos favoritos").fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onNodeWithTag("movie-favorite-42").performClick()
 
-        composeRule.onNodeWithText("Save favorite").assertExists()
+        composeRule.onNodeWithText("Salvar como favorito").assertExists()
     }
 
     private class FakeMovieRepository(private val movie: Movie) : MovieRepository {

@@ -12,6 +12,7 @@ import coil3.request.error
 import coil3.request.fallback
 import coil3.request.placeholder
 import com.example.tmdbmovies.R
+import com.example.tmdbmovies.core.ui.formatReleaseDate
 import com.example.tmdbmovies.core.ui.tmdbBackdropUrl
 import com.example.tmdbmovies.databinding.FragmentMovieDetailsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -63,7 +64,7 @@ class MovieDetailsFragment : Fragment() {
         val title = movie.title ?: getString(R.string.movie_title_unavailable)
         binding.movieTitle.text = title
         binding.movieOverview.text = movie.overview ?: getString(R.string.movie_overview_unavailable)
-        binding.movieReleaseDate.text = movie.releaseDate?.let {
+        binding.movieReleaseDate.text = formatReleaseDate(movie.releaseDate)?.let {
             getString(R.string.details_release_date, it)
         } ?: getString(R.string.movie_date_unavailable)
         binding.movieRating.isVisible = movie.voteAverage != null

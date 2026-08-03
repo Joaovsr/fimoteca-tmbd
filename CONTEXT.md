@@ -6,7 +6,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 
 ## Estado
 
-**Fase atual:** Fase 11 — Quality gate final de filmes é a próxima fase; a Fase 10 foi concluída com validação automatizada, checklist manual no AVD, README e screenshots finais.
+**Fase atual:** Fase 11 — Quality gate final de filmes concluída. A entrega de filmes está pronta; a Fase 12 (séries) continua opcional e depende de confirmação explícita de escopo.
 
 **Código Android:** módulo único `app` com descoberta, pesquisa e filtros paginados reais em Compose, detalhes reais em Fragment XML, favoritos persistentes com Room, Retrofit/Paging/Coil e navegação por ID.
 
@@ -56,7 +56,7 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - A busca existente foi movida para um destino próprio sem alterar seus contratos de Paging; Perfil é um destino local navegável com versão, escopo e atribuição textual do TMDB.
 - A Home usa fontes editoriais independentes para trending semanal, now playing, top rated e clássicos; cada seção possui loading, vazio, erro e retry isolados.
 - Clássicos usa `discover/movie` com `vote_average.desc`, nota mínima 7,0, no mínimo 1.000 votos e lançamento até 2005-12-31; não há filtragem local de páginas.
-- O banner é estático e selecionável entre os cinco primeiros filmes em alta; a seleção é preservada no `SavedStateHandle` e favoritos continuam reativos via Room.
+- O banner alterna automaticamente a cada cinco segundos entre os cinco primeiros filmes em alta, aceita swipe e seleção pelos indicadores; o índice é preservado no `SavedStateHandle`, o intervalo respeita o timeout de acessibilidade e favoritos continuam reativos via Room.
 - Favoritos possui busca local, grid adaptável e cinco ordenações derivadas na UI; “adicionados recentemente” preserva a ordem emitida pelo Room e nenhuma ordenação altera `favoritedAt`.
 - Favoritos usa três colunas fixas; em telas compactas de 432 dp os cards ficam com cerca de 133 dp, equivalentes aos 132 dp da Home, e encolhem proporcionalmente em larguras menores.
 - Busca e ordenação de Favoritos são preservadas em `SavedStateHandle`; o estado vazio retorna à Home e a remoção continua imediata pela fonte local.
@@ -65,10 +65,13 @@ Este arquivo é mutável. Ele registra o estado presente e não repete regras pe
 - Detalhes preserva Fragment XML, View Binding e LiveData e usa somente o backdrop com gradiente como imagem principal, seguido por metadados, nota real, favorito e sinopse; o pôster permanece disponível para listas/favoritos e `vote_average` continua nullável em todas as fronteiras.
 - Busca preserva Paging, filtros e cancelamento, com cards e estados alinhados aos tokens finais; botões tonais usam a superfície secundária em Compose e Views.
 - Screenshots finais com dados reais ficam em `docs/screenshots/` e o README documenta escopo, setup, execução, testes, arquitetura e limites.
+- Todos os textos da interface estão em português do Brasil, incluindo acessibilidade e mensagens de erro; somente o aviso obrigatório do TMDB permanece no inglês exigido pela atribuição oficial.
+- Datas completas são mantidas em ISO (`yyyy-MM-dd`) nas camadas de domínio/dados e exibidas como `dd/MM/yyyy` somente na fronteira de UI; Home e Favoritos continuam mostrando apenas o ano.
+- A Fase 11 aprovou fronteiras, segurança do token, ausência de logging sensível, setup do README, critérios funcionais e gates automatizados sem falha bloqueante.
 
 ## Próxima ação
 
-Executar a **Fase 11 — Quality gate final de filmes** em modo de revisão: dependências e fronteiras, segredo/logging, gates limpos, critérios de aceite e limitações reais.
+Aguardar decisão sobre a **Fase 12 — Séries**. Não iniciar discover, pesquisa, detalhes ou favoritos de séries sem confirmação explícita de escopo.
 
 ## Escolhas provisórias do bootstrap
 
@@ -81,9 +84,10 @@ Use valores provisórios consistentes caso o responsável não defina outros:
 
 Não bloqueie a implementação por essas escolhas; elas podem ser renomeadas antes da entrega final.
 
-## Riscos conhecidos
+## Limitações conhecidas
 
-- A disponibilidade do modelo configurado para subagentes depende do ambiente do usuário; remova ou substitua a linha de modelo caso necessário.
+- O cenário end-to-end sem token não foi recompilado manualmente na Fase 11; o interceptor sem header e a mensagem segura possuem cobertura automatizada/estática.
+- O lint mantém apenas avisos não bloqueantes de baseline/versões e de APIs de teste Compose em descontinuação; não há erro de lint.
 
 ## Registro de progresso
 
@@ -152,7 +156,7 @@ Adicione entradas curtas, somente após mudanças significativas:
 
 2026-08-03 — Fase 8 concluída
 - Concluído: fontes editoriais independentes, estado agregado com retry por seção, banner selecionável, carrosséis de pôsteres, favoritos reativos e navegação para Busca/Detalhes.
-- Decidido: clássicos usa corte até 2005-12-31, nota mínima 7,0, mínimo de 1.000 votos e ordenação por nota; o banner não avança automaticamente.
+- Decidido: clássicos usa corte até 2005-12-31, nota mínima 7,0, mínimo de 1.000 votos e ordenação por nota; naquela entrega, o banner ainda não avançava automaticamente, decisão posteriormente substituída pela rotação com swipe.
 - Pendente: grid, quantidade e ordenação de Favoritos, resumo real e logo oficial do TMDB no Perfil na Fase 9.
 - Evidência: endpoints e regra editorial cobertos por MockWebServer; ViewModel e UI cobrem sucesso, vazio, erro isolado, retry, seleção e favorito; gate completo e inspeção no Pixel_9/API 37 executados.
 
@@ -173,6 +177,24 @@ Adicione entradas curtas, somente após mudanças significativas:
 - Decidido: o pôster continua no domínio e nas demais telas, mas Detalhes usa somente o banner para evitar repetição visual.
 - Pendente: nenhum escopo adicional; permanece a Fase 11 como próxima ação.
 - Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug connectedDebugAndroidTest` passou com 20 instrumentados; inspeção no Pixel_9/API 37 confirmou somente o banner na árvore visual/acessível, sem espaço reservado para o pôster.
+
+2026-08-03 — Fase 11 concluída
+- Concluído: fronteiras, dependências, segredo/logging, critérios de aceite e README revisados; interface, acessibilidade e screenshots traduzidos para português do Brasil; cores literais remanescentes substituídas por tokens semânticos.
+- Decidido: manter somente o aviso obrigatório `This product uses the TMDB API but is not endorsed or certified by TMDB.` em inglês; séries permanecem fora do escopo até confirmação explícita.
+- Pendente: validação manual end-to-end de um build sem token; nenhuma falha bloqueante permanece na entrega de filmes.
+- Evidência: `./gradlew clean assembleDebug testDebugUnitTest lintDebug` passou; `./gradlew connectedDebugAndroidTest` passou com 20 testes no Pixel_9/Android 17; revisão final sem vazamento de segredo ou fronteira indevida.
+
+2026-08-03 — Datas localizadas na UI
+- Concluído: datas completas da Busca e de Detalhes passaram a usar `dd/MM/yyyy`; fallbacks e screenshots correspondentes foram atualizados.
+- Decidido: preservar `yyyy-MM-dd` no domínio, persistência, ordenação e integração TMDB, formatando apenas para exibição.
+- Pendente: nenhum.
+- Evidência: `./gradlew assembleDebug testDebugUnitTest lintDebug` passou; `./gradlew connectedDebugAndroidTest` passou com 20 testes no Pixel_9/Android 17; AVD exibiu `Lançamento · 28/07/2026`.
+
+2026-08-03 — Banner da Home com rotação automática e swipe
+- Concluído: o destaque passou a usar pager horizontal, avançar a cada cinco segundos e responder a swipe sem abrir Detalhes; indicadores, favorito e índice preservado foram mantidos.
+- Decidido: o intervalo usa o timeout recomendado de acessibilidade do Compose, pausando efetivamente a rotação automática durante exploração por toque sem impedir a troca manual.
+- Pendente: nenhum.
+- Evidência: testes instrumentados reproduziram a ausência do pager antes da correção e cobrem swipe, ausência de navegação indevida e avanço automático; `./gradlew assembleDebug testDebugUnitTest lintDebug` e `./gradlew connectedDebugAndroidTest` passaram com 22 instrumentados; AVD com dados reais confirmou autoavanço e swipe.
 ```
 
 Use este formato para entradas futuras:

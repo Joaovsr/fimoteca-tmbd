@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -33,12 +35,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -50,11 +53,15 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.tmdbmovies.R
 import com.example.tmdbmovies.core.ui.theme.MovieAccent
+import com.example.tmdbmovies.core.ui.theme.MovieBackground
 import com.example.tmdbmovies.core.ui.tmdbBackdropUrl
 import com.example.tmdbmovies.core.ui.tmdbPosterUrl
 import com.example.tmdbmovies.domain.model.MovieCollection
 import com.example.tmdbmovies.feature.movies.MovieUiModel
 import java.util.Locale
+import kotlinx.coroutines.delay
+
+private const val FEATURED_AUTO_ADVANCE_MILLIS = 5_000L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,10 +133,61 @@ private fun FeaturedContent(
     onSelected: (Int) -> Unit,
 ) {
     when {
-        featured != null -> FeaturedMovieBanner(featured, featuredMovies.size, selectedIndex, onMovieClick, onFavoriteClick, onSelected)
+        featured != null -> FeaturedMoviesPager(featuredMovies, selectedIndex, onMovieClick, onFavoriteClick, onSelected)
         section.isLoading -> FeaturedPlaceholder()
         section.errorMessageRes != null -> SectionMessage(section.errorMessageRes, onRetry, Modifier.padding(horizontal = 16.dp).height(220.dp))
         else -> SectionEmpty(Modifier.padding(horizontal = 16.dp).height(180.dp))
+    }
+}
+
+@Composable
+private fun FeaturedMoviesPager(
+    movies: List<MovieUiModel>,
+    selectedIndex: Int,
+    onMovieClick: (Long) -> Unit,
+    onFavoriteClick: (MovieUiModel) -> Unit,
+    onSelected: (Int) -> Unit,
+) {
+    val safeSelectedIndex = selectedIndex.coerceIn(0, movies.lastIndex)
+    val pagerState = rememberPagerState(initialPage = safeSelectedIndex) { movies.size }
+    val autoAdvanceDelayMillis = LocalAccessibilityManager.current?.calculateRecommendedTimeoutMillis(
+        originalTimeoutMillis = FEATURED_AUTO_ADVANCE_MILLIS,
+        containsText = true,
+        containsControls = true,
+    ) ?: FEATURED_AUTO_ADVANCE_MILLIS
+
+    LaunchedEffect(safeSelectedIndex, movies.size) {
+        if (!pagerState.isScrollInProgress && pagerState.settledPage != safeSelectedIndex) {
+            pagerState.animateScrollToPage(safeSelectedIndex)
+        }
+    }
+    LaunchedEffect(pagerState.settledPage, movies.size, autoAdvanceDelayMillis) {
+        val settledPage = pagerState.settledPage
+        if (settledPage !in movies.indices) return@LaunchedEffect
+        onSelected(settledPage)
+        if (movies.size > 1) {
+            delay(autoAdvanceDelayMillis)
+            if (!pagerState.isScrollInProgress) {
+                pagerState.animateScrollToPage((settledPage + 1) % movies.size)
+            }
+        }
+    }
+
+    Box(Modifier.fillMaxWidth().semantics { testTag = "featured-movie" }) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxWidth().height(272.dp).semantics { testTag = "featured-pager" },
+            userScrollEnabled = movies.size > 1,
+        ) { page ->
+            FeaturedMovieBanner(
+                movie = movies[page],
+                pageCount = movies.size,
+                selectedIndex = page,
+                onMovieClick = onMovieClick,
+                onFavoriteClick = onFavoriteClick,
+                onSelected = onSelected,
+            )
+        }
     }
 }
 
@@ -143,9 +201,11 @@ private fun FeaturedMovieBanner(
     onSelected: (Int) -> Unit,
 ) {
     val title = movie.title.ifBlank { stringResource(R.string.movie_title_unavailable) }
+    val badgeContentColor = MaterialTheme.colorScheme.onPrimary
+    val featuredIndicatorColor = MaterialTheme.colorScheme.onBackground
     Card(
         onClick = { onMovieClick(movie.id) },
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(272.dp).semantics { testTag = "featured-movie" },
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(272.dp).semantics { testTag = "featured-movie-${movie.id}" },
         shape = RoundedCornerShape(14.dp),
     ) {
         Box(Modifier.fillMaxSize()) {
@@ -160,7 +220,7 @@ private fun FeaturedMovieBanner(
             )
             Box(
                 Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .88f)), startY = 55f),
+                    Brush.verticalGradient(listOf(MovieBackground.copy(alpha = 0f), MovieBackground.copy(alpha = .88f)), startY = 55f),
                 ),
             )
             FavoriteIcon(movie, onFavoriteClick, Modifier.align(Alignment.TopEnd).padding(8.dp))
@@ -169,18 +229,19 @@ private fun FeaturedMovieBanner(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Surface(color = MovieAccent, shape = RoundedCornerShape(12.dp)) {
-                    Text(stringResource(R.string.discover_badge_trending), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), color = Color.Black, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.discover_badge_trending), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), color = badgeContentColor, style = MaterialTheme.typography.labelSmall)
                 }
                 Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(metadata(movie), style = MaterialTheme.typography.bodySmall)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
                     repeat(pageCount) { index ->
                         val selected = index == selectedIndex
+                        val positionDescription = stringResource(R.string.discover_featured_position, index + 1, pageCount)
                         Box(
                             Modifier.size(if (selected) 10.dp else 8.dp).clip(CircleShape)
-                                .background(if (selected) MovieAccent else Color.White.copy(alpha = .55f))
+                                .background(if (selected) MovieAccent else featuredIndicatorColor.copy(alpha = .55f))
                                 .clickable { onSelected(index) }
-                                .semantics { contentDescription = "${index + 1} de $pageCount" },
+                                .semantics { contentDescription = positionDescription },
                         )
                     }
                 }
@@ -224,8 +285,8 @@ private fun MoviePosterCard(movie: MovieUiModel, collection: MovieCollection, on
             )
             FavoriteIcon(movie, onFavoriteClick, Modifier.align(Alignment.TopEnd).padding(6.dp))
             if (collection == MovieCollection.Classics) movie.releaseDate?.take(4)?.toIntOrNull()?.let { year ->
-                Surface(Modifier.align(Alignment.BottomStart).padding(6.dp), color = Color.Black.copy(alpha = .72f), shape = RoundedCornerShape(10.dp)) {
-                    Text(decadeLabel(year), Modifier.padding(horizontal = 7.dp, vertical = 3.dp), style = MaterialTheme.typography.labelSmall)
+                Surface(Modifier.align(Alignment.BottomStart).padding(6.dp), color = MovieBackground.copy(alpha = .72f), shape = RoundedCornerShape(10.dp)) {
+                    Text(stringResource(R.string.discover_decade, (year / 10) * 10), Modifier.padding(horizontal = 7.dp, vertical = 3.dp), style = MaterialTheme.typography.labelSmall)
                 }
             }
         }
@@ -237,8 +298,9 @@ private fun MoviePosterCard(movie: MovieUiModel, collection: MovieCollection, on
 @Composable
 private fun FavoriteIcon(movie: MovieUiModel, onFavoriteClick: (MovieUiModel) -> Unit, modifier: Modifier = Modifier) {
     val title = movie.title.ifBlank { stringResource(R.string.movie_title_unavailable) }
+    val iconColor = MaterialTheme.colorScheme.onBackground
     Box(modifier = modifier.size(48.dp), contentAlignment = Alignment.Center) {
-        Surface(modifier = Modifier.size(40.dp), shape = CircleShape, color = Color.Black.copy(alpha = .68f)) {}
+        Surface(modifier = Modifier.size(40.dp), shape = CircleShape, color = MovieBackground.copy(alpha = .68f)) {}
         IconButton(
             onClick = { onFavoriteClick(movie) },
             modifier = Modifier.fillMaxSize().semantics { testTag = "discover-favorite-${movie.id}" },
@@ -246,7 +308,7 @@ private fun FavoriteIcon(movie: MovieUiModel, onFavoriteClick: (MovieUiModel) ->
             Icon(
                 painterResource(if (movie.isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_outline),
                 stringResource(if (movie.isFavorite) R.string.favorite_remove_description else R.string.favorite_save_description, title),
-                tint = if (movie.isFavorite) MovieAccent else Color.White,
+                tint = if (movie.isFavorite) MovieAccent else iconColor,
                 modifier = Modifier.size(24.dp),
             )
         }
@@ -284,5 +346,3 @@ private fun metadata(movie: MovieUiModel): String = buildList {
     movie.releaseDate?.take(4)?.let(::add)
     movie.voteAverage?.takeIf { it > 0.0 }?.let { add("★ ${String.format(Locale.getDefault(), "%.1f", it)}") }
 }.joinToString("  •  ").ifBlank { "—" }
-
-private fun decadeLabel(year: Int): String = "ANOS ${(year / 10) * 10}"

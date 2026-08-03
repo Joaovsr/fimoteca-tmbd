@@ -48,7 +48,7 @@ class MovieDetailsFragmentTest {
                 onView(withText(R.string.retry)).perform(click())
                 onView(withText("Clube da Luta")).check(matches(isDisplayed()))
                 onView(withText(R.string.movie_overview_unavailable)).check(matches(isDisplayed()))
-                onView(withText(R.string.movie_date_unavailable)).check(matches(isDisplayed()))
+                onView(withText("Lançamento · 15/10/1999")).check(matches(isDisplayed()))
                 onView(withText("★ 8.4")).check(matches(isDisplayed()))
 
                 scenario.recreate()
@@ -75,7 +75,17 @@ class MovieDetailsFragmentTest {
             return if (requests.size == 1) {
                 AppResult.Failure(AppError.NoConnection)
             } else {
-                AppResult.Success(MovieDetails(movieId, "Clube da Luta", null, null, null, null, 8.4))
+                AppResult.Success(
+                    MovieDetails(
+                        movieId = movieId,
+                        title = "Clube da Luta",
+                        overview = null,
+                        posterPath = null,
+                        backdropPath = null,
+                        releaseDate = "1999-10-15",
+                        voteAverage = 8.4,
+                    ),
+                )
             }
         }
     }

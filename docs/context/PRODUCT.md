@@ -19,6 +19,7 @@ Como usuário, quero abrir o aplicativo e ver filmes paginados para descobrir t�
 - Há ação de tentar novamente após falha.
 - Filmes sem imagem ou data utilizam fallback visual/textual adequado.
 - A Home diferencia filme em destaque, em alta na semana, nos cinemas, clássicos e mais bem avaliados.
+- O destaque alterna automaticamente entre os cinco primeiros filmes em alta e também responde a deslize horizontal e seleção dos indicadores.
 - Cada seção possui fonte de dados e regra explícitas; “clássicos” não é apresentado como categoria oficial do TMDB.
 - O usuário consegue abrir um filme e alternar seu favorito a partir dos cards aplicáveis.
 

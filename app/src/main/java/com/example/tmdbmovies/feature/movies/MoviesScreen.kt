@@ -65,6 +65,7 @@ import coil3.compose.AsyncImage
 import com.example.tmdbmovies.R
 import com.example.tmdbmovies.core.common.AppError
 import com.example.tmdbmovies.core.common.AppErrorException
+import com.example.tmdbmovies.core.ui.formatReleaseDate
 import com.example.tmdbmovies.core.ui.tmdbPosterUrl
 import com.example.tmdbmovies.domain.model.Genre
 import com.example.tmdbmovies.domain.model.MovieFilters
@@ -510,7 +511,7 @@ private fun MovieCard(movie: MovieUiModel, onClick: () -> Unit, onFavoriteClick:
             ) {
                 Text(title, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    movie.releaseDate ?: stringResource(R.string.movie_date_unavailable),
+                    formatReleaseDate(movie.releaseDate) ?: stringResource(R.string.movie_date_unavailable),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -1,10 +1,10 @@
-# TMDB Movies
+# TMDB Filmes
 
 Aplicativo Android nativo para descobrir, pesquisar, filtrar, detalhar e favoritar filmes usando a API do [The Movie Database (TMDB)](https://www.themoviedb.org/).
 
 ## Experiência
 
-- Home editorial com destaque, filmes em alta, em cartaz, clássicos e mais bem avaliados.
+- Início editorial com destaque, filmes em alta, em cartaz, clássicos e mais bem avaliados.
 - Busca paginada por título, com debounce, cancelamento e filtros compatíveis com o endpoint ativo.
 - Detalhes em Fragment XML com banner/backdrop, data, nota, favorito e sinopse.
 - Favoritos locais persistidos com Room, busca e cinco ordenações sem depender de rede.
@@ -13,16 +13,16 @@ Aplicativo Android nativo para descobrir, pesquisar, filtrar, detalhar e favorit
 
 ## Screenshots
 
-| Home | Busca | Detalhes | Favoritos |
+| Início | Busca | Detalhes | Favoritos |
 |---|---|---|---|
-| ![Home com filme em destaque e carrosséis](docs/screenshots/home.png) | ![Busca com filtros e resultados](docs/screenshots/search.png) | ![Detalhes de um filme](docs/screenshots/details.png) | ![Coleção local de favoritos](docs/screenshots/favorites.png) |
+| ![Início com filme em destaque e carrosséis](docs/screenshots/home.png) | ![Busca com filtros e resultados](docs/screenshots/search.png) | ![Detalhes de um filme](docs/screenshots/details.png) | ![Coleção local de favoritos](docs/screenshots/favorites.png) |
 
 As imagens foram capturadas no emulador com dados reais retornados pelo TMDB em 3 de agosto de 2026.
 
 ## Stack e arquitetura
 
 - Kotlin, Coroutines, Flow, StateFlow e LiveData.
-- Jetpack Compose nas telas de Home, Busca, Favoritos e Perfil.
+- Jetpack Compose nas telas de Início, Busca, Favoritos e Perfil.
 - Fragment + XML + View Binding em Detalhes.
 - Navigation Component com uma única Activity.
 - Retrofit, Kotlin serialization e OkHttp para rede.

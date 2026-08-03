@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -54,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.tmdbmovies.R
 import com.example.tmdbmovies.core.ui.theme.MovieAccent
+import com.example.tmdbmovies.core.ui.theme.MovieBackground
 import com.example.tmdbmovies.core.ui.tmdbPosterUrl
 import java.util.Locale
 
@@ -176,7 +176,7 @@ private fun FavoritePosterCard(movie: FavoriteMovieUiModel, onClick: () -> Unit,
                 modifier = Modifier.fillMaxSize(),
             )
             Box(Modifier.align(Alignment.TopEnd).padding(6.dp).size(48.dp), contentAlignment = Alignment.Center) {
-                Surface(Modifier.size(40.dp), shape = CircleShape, color = Color.Black.copy(alpha = .68f)) {}
+                Surface(Modifier.size(40.dp), shape = CircleShape, color = MovieBackground.copy(alpha = .68f)) {}
                 IconButton(
                     onClick = onRemoveClick,
                     modifier = Modifier.fillMaxSize().semantics { testTag = "favorite-remove-${movie.id}" },

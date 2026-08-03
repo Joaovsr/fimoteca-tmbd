@@ -88,7 +88,7 @@ Ordem vertical:
 6. `Mais bem avaliados`;
 7. navegação inferior.
 
-As seções usam carrosséis horizontais de `MoviePosterCard`. `Ver todos` abre uma lista paginada reutilizando a busca/filtros existentes com o contexto da seção. O banner não deve avançar automaticamente na primeira implementação; isso evita problemas de acessibilidade e estado sem acrescentar valor essencial.
+As seções usam carrosséis horizontais de `MoviePosterCard`. `Ver todos` abre uma lista paginada reutilizando a busca/filtros existentes com o contexto da seção. O banner avança automaticamente a cada cinco segundos, aceita deslize horizontal e seleção pelos indicadores. Uma interação reinicia o intervalo; com exploração por toque/TalkBack ativa, o avanço automático fica pausado e a troca manual continua disponível.
 
 `Clássicos imperdíveis` é uma curadoria algorítmica, não uma categoria oficial do TMDB. Deve usar regra explícita e testável, como data limite, nota mínima e quantidade mínima de votos. O chip de década é derivado do ano.
 

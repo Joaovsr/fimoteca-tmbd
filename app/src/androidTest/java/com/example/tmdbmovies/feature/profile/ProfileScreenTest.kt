@@ -18,10 +18,10 @@ class ProfileScreenTest {
             TmdbMoviesTheme { ProfileScreen(versionName = "1.0-test", favoriteCount = 7) }
         }
 
-        composeRule.onNodeWithText("Your collection").assertExists()
-        composeRule.onNodeWithText("7 movies saved locally. Your collection stays on this device.").assertExists()
-        composeRule.onNodeWithContentDescription("The Movie Database").assertExists()
-        composeRule.onNodeWithText("TMDB Movies · Version 1.0-test").assertExists()
+        composeRule.onNodeWithText("Sua coleção").assertExists()
+        composeRule.onNodeWithText("7 filmes salvos localmente. Sua coleção permanece neste dispositivo.").assertExists()
+        composeRule.onNodeWithContentDescription("Logo do The Movie Database").assertExists()
+        composeRule.onNodeWithText("TMDB Filmes · Versão 1.0-test").assertExists()
         composeRule.onNodeWithText(
             "This product uses the TMDB API but is not endorsed or certified by TMDB.",
         ).assertExists()

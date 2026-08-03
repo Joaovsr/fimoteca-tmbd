@@ -22,7 +22,7 @@ class FavoritesScreenTest {
         }
 
         composeRule.onNodeWithTag("favorites-empty").assertExists()
-        composeRule.onNodeWithText("Movies marked with a heart will appear here.").assertExists()
+        composeRule.onNodeWithText("Os filmes marcados com um coração aparecerão aqui.").assertExists()
     }
 
     @Test
@@ -80,6 +80,6 @@ class FavoritesScreenTest {
             }
         }
         composeRule.onNodeWithTag("favorites-sort").performClick()
-        composeRule.onNodeWithText("Highest rating").assertExists()
+        composeRule.onNodeWithText("Maior nota").assertExists()
     }
 }
